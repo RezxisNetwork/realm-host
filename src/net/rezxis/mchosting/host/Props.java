@@ -12,7 +12,6 @@ import java.security.ProtectionDomain;
 import java.util.Properties;
 
 public class Props {
-	public final String MAX_MEM;
 	public final String BASE_DIR;
 	public final String SERVER_JAR_NAME;
 	public final boolean USE_WINDOW;
@@ -35,8 +34,7 @@ public class Props {
 	        prop.load(istream);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-        MAX_MEM=prop.getProperty("max_mem");
+		}  
         BASE_DIR=prop.getProperty("base_dir");
         USE_WINDOW=Boolean.parseBoolean(prop.getProperty("use_window"));
         MAX_SERVERS = Integer.valueOf(prop.getProperty("max_servers"));

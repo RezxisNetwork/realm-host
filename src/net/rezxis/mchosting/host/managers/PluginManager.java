@@ -21,23 +21,19 @@ public class PluginManager {
 	public static void checkPlugins(DBServer server) throws Exception {
 		HashMap<String,DBPlugin> plugins = HostServer.plTable.getPlugins();
 		DBPlugin rezxisMC = plugins.get("RezxisMCHosting");
-		DBPlugin rezxisGUI = plugins.get("RezxisMCHostingGUI");
 		server.sync();
 		check(server, rezxisMC);
-		check(server, rezxisGUI);
 		for (String p : server.getPlugins()) {
 			if (plugins.containsKey(p))
 				check(server, plugins.get(p));
 		}
 		File f = new File("servers/"+server.getID()+"/plugins/");
-		String[] ignore = new String[] {"PluginMetrics","database.propertis","hosting.propertis","GUI.jar","GamePlugin.jar"};
 		File db = new File(f,"database.propertis");
 		File sync = new File(f,"hosting.propertis");
 		db(db);
 		sync(sync);
 		ArrayList<DBPlugin> list = new ArrayList<DBPlugin>(plugins.values());
 		list.remove(rezxisMC);
-		list.remove(rezxisGUI);
 		for (String s : server.getPlugins()) {
 			DBPlugin p = plugins.get(s);
 			list.remove(p);

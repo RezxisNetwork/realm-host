@@ -1,7 +1,6 @@
 package net.rezxis.mchosting.host.game;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
@@ -10,7 +9,7 @@ import net.rezxis.mchosting.host.HostServer;
 
 public class ServerFileUtil {
 
-	public static File generateServerFile(String serverName,int port,String type)  {
+	public static File generateServerFile(String serverName,int port,String type,boolean cmd)  {
 		File base = new File(HostServer.props.BASE_DIR);
 		System.out.println(base.getAbsolutePath());
 		File gameDir = new File("servers/"+serverName);
@@ -23,7 +22,7 @@ public class ServerFileUtil {
 		}
 
 		copyDirectory(base,gameDir);
-		MCProperties mcprop=new MCProperties(serverName,port,type);
+		MCProperties mcprop=new MCProperties(serverName,port,type,cmd);
 		try {
 			mcprop.generateFile(gameDir);
 		}catch(Exception e) {

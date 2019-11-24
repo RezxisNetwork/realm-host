@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class MCProperties {
     final Properties properties = new Properties();
-    public MCProperties(String name,int port, String type) {
+    public MCProperties(String name,int port, String type, boolean cmd) {
     	properties.setProperty("spawn-protection", ""+0);
     	properties.setProperty("max-tick-time", ""+60000);
     	properties.setProperty("query.port", ""+25567);
@@ -37,7 +37,7 @@ public class MCProperties {
     		properties.setProperty("level-type", "FLAT");
     	if (type.equalsIgnoreCase("void"))
     		properties.setProperty("level-type", "FLAT");
-    	properties.setProperty("enable-command-block", "true");
+    	properties.setProperty("enable-command-block", String.valueOf(cmd));
     	properties.setProperty("max-players", "10");
     	properties.setProperty("network-compression-threshold", "-1");
     	properties.setProperty("resource-pack-sha1", "");
@@ -61,7 +61,9 @@ public class MCProperties {
     }
 
     public void generateFile(File gameDir) throws FileNotFoundException, IOException {
-        properties.store(new FileOutputStream(new File(gameDir,"server.properties")), "Annihilation server properties");
+    	FileOutputStream fos = new FileOutputStream(new File(gameDir,"server.properties"));
+        properties.store(fos, "Rezxis Realms");
+        fos.close();
         
     }
 }

@@ -7,26 +7,24 @@ import net.rezxis.mchosting.host.HostServer;
 
 public class GameMaker {
 
-	private String serverName;
 	private String bukkitSettings = "bukkit.yml";
 	private String commandsSettings = "commands.yml";
 	private String config = "server.properties";
-	private boolean eulaArgee = true;
 	private String host = ""; //empty is default
-	private int maxPlayers = 120;
+	private int maxPlayers = 20;
 	private String plugins = "plugins";
 	private int port = 25565;
-	private String spigotSettings = "spigot.yml";
 	private File spigotJar;
 	private File defDir;
+	private String mem;
 
-	public GameMaker(String serverName, File spigotJar, File defDir) {
+	public GameMaker(File spigotJar, File defDir, String mem) {
 		if (!defDir.exists()) {
 			defDir.mkdirs();
 		}
 		this.spigotJar = spigotJar;
 		this.defDir = defDir;
-		this.serverName = serverName;
+		this.mem = mem;
 	}
 
 	public Process runProcess() {
@@ -40,7 +38,7 @@ public class GameMaker {
 		}
 
 		args.add("java");
-		args.add("-Xmx"+HostServer.props.MAX_MEM);
+		args.add("-Xmx"+mem);
 		args.add("-jar");
 
 		args.add(this.spigotJar.getAbsolutePath());
@@ -96,9 +94,5 @@ public class GameMaker {
 
 	public void setPort(int port) {
 		this.port = port;
-	}
-
-	public void setSpigotSettings(String c) {
-		this.spigotSettings = c;
 	}
 }

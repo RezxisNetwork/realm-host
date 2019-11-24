@@ -1,17 +1,23 @@
 package net.rezxis.mchosting.host.managers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
-import org.java_websocket.WebSocket;
+import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gson.Gson;
 
+import net.rezxis.mchosting.databse.DBPlayer;
 import net.rezxis.mchosting.databse.DBServer;
+import net.rezxis.mchosting.databse.DBShop;
 import net.rezxis.mchosting.databse.ServerStatus;
 import net.rezxis.mchosting.host.HostServer;
+import net.rezxis.mchosting.host.RezxisHTTPAPI;
 import net.rezxis.mchosting.host.game.GameMaker;
 import net.rezxis.mchosting.host.game.MCProperties;
 import net.rezxis.mchosting.host.game.ServerFileUtil;
@@ -20,6 +26,8 @@ import net.rezxis.mchosting.network.packet.host.HostDeleteServer;
 import net.rezxis.mchosting.network.packet.host.HostRebootServer;
 import net.rezxis.mchosting.network.packet.host.HostStartServer;
 import net.rezxis.mchosting.network.packet.host.HostStopServer;
+import net.rezxis.mchosting.network.packet.host.HostWorldPacket;
+import net.rezxis.mchosting.network.packet.host.HostWorldPacket.Action;
 import net.rezxis.mchosting.network.packet.sync.SyncServerCreated;
 import net.rezxis.mchosting.network.packet.sync.SyncStoppedServer;
 
@@ -37,14 +45,17 @@ public class GameManager {
 			System.out.println("A server to tried to create has already depolyed");
 			return;
 		}
-		DBServer server = new DBServer(-1, createPacket.displayName, UUID.fromString(createPacket.player), -1, new ArrayList<>(),-1,ServerStatus.STOP,createPacket.world, HostServer.props.HOST_ID,"");
+		DBServer server = new DBServer(-1, createPacket.displayName,
+				UUID.fromString(createPacket.player), -1, new ArrayList<>(),
+				-1,ServerStatus.STOP,createPacket.world, HostServer.props.HOST_ID,
+				"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()));
 		HostServer.sTable.insert(server);
 		ArrayList<String> array = new ArrayList<>();
 		array.add("ViaVersion");
 		server.setPlugins(array);
 		server.update();
 		new Thread(()->{
-			ServerFileUtil.generateServerFile(String.valueOf(server.getID()), 1, server.getWorld());
+			ServerFileUtil.generateServerFile(String.valueOf(server.getID()), 1, server.getWorld(), server.getCmd());
 			SyncServerCreated packet = new SyncServerCreated(server.getOwner().toString());
 			HostServer.client.send(gson.toJson(packet));
 		}).start();
@@ -65,6 +76,7 @@ public class GameManager {
 		DBServer server = HostServer.sTable.get(UUID.fromString(packet.player));
 		if (server == null) {
 			System.out.println("The server was not found");
+			return;
 		}
 		if (runningServers > HostServer.props.MAX_SERVERS) {
 			System.out.println("There are no space to start server");
@@ -80,21 +92,30 @@ public class GameManager {
 	}
 	
 	private static void runServerIn(DBServer server, int port) {
-		MCProperties props = new MCProperties(String.valueOf(server.getID()), currentPort, server.getWorld());
 		try {
-			props.generateFile(new File("servers/"+server.getID()));
-			PluginManager.checkPlugins(server);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("couldn't initialize plugins.");
-			return;
+			MCProperties props = new MCProperties(String.valueOf(server.getID()), currentPort, server.getWorld(), server.getCmd());
+			try {
+				props.generateFile(new File("servers/"+server.getID()));
+				PluginManager.checkPlugins(server);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("couldn't initialize plugins.");
+				return;
+			}
+			DBPlayer player = HostServer.psTable.get(server.getOwner());
+			GameMaker gm = new GameMaker(new File(HostServer.props.SERVER_JAR_NAME),new File("servers/"+server.getID()), player.getRank().getMem());
+			gm.setMaxPlayer(player.getRank().getMaxPlayers());
+			gm.setPort(port);
+			server.setPort(port);
+			server.setPlayers(0);
+			server.update();
+			processes.put(server.getID(), gm.runProcess());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			server.setStatus(ServerStatus.STOP);
+			server.update();
+			runningServers -= 1;
 		}
-		GameMaker gm = new GameMaker(String.valueOf(server.getID()),new File(HostServer.props.SERVER_JAR_NAME),new File("servers/"+server.getID()));
-		gm.setPort(port);
-		server.setPort(port);
-		server.setPlayers(0);
-		server.update();
-		processes.put(server.getID(), gm.runProcess());
 	}
 	
 	public static void forceStop(String json) {
@@ -116,10 +137,61 @@ public class GameManager {
 		HostDeleteServer packet = gson.fromJson(json, HostDeleteServer.class);
 		new Thread(()->{
 			try {
-				new File("servers/"+packet.id).delete();
+				new File("servers/"+packet.id+"/").delete();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}).start();
+	}
+	
+	public static void world(String json) {
+		HostWorldPacket packet = gson.fromJson(json, HostWorldPacket.class);
+		if (packet.action == Action.UPLOAD)
+			uploadWorld(packet);
+		else
+			downloadWorld(packet);
+	}
+	
+	private static void uploadWorld(HostWorldPacket packet) {
+		long time = System.currentTimeMillis();
+		String uuid = packet.values.get("uuid");
+		String secret = packet.values.get("secret");
+		DBServer server = HostServer.sTable.get(UUID.fromString(uuid));
+		File cacheDir = new File("cache");
+		if (!cacheDir.exists())
+			cacheDir.mkdirs();
+		File cache = new File(cacheDir, uuid+"world.zip");
+		try {
+			RezxisHTTPAPI.download(cache, secret, uuid);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		if (!isZipFile(cache)) {
+			return;
+		}
+		File dest = new File("servers/"+server.getID()+"/world");
+		dest.delete();
+		dest.mkdir();
+		ZipUtil.unpack(cache, dest);
+		cache.delete();
+		System.out.println("world upload takes "+(System.currentTimeMillis()-time)+"ms");
+	}
+	
+	private static boolean isZipFile(File f) {
+        if (f.isDirectory())
+            return false;
+        try {
+            ZipFile file = new ZipFile(f);
+            return true;
+        } catch (ZipException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+	
+	private static void downloadWorld(HostWorldPacket packet) {
+		
 	}
 }

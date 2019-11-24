@@ -6,6 +6,7 @@ import net.rezxis.mchosting.host.managers.GameManager;
 import net.rezxis.mchosting.network.packet.Packet;
 import net.rezxis.mchosting.network.packet.PacketType;
 import net.rezxis.mchosting.network.packet.ServerType;
+import net.rezxis.mchosting.network.packet.host.HostWorldPacket;
 
 public class WorkerThread extends Thread {
 
@@ -38,6 +39,8 @@ public class WorkerThread extends Thread {
 			GameManager.rebootServer(message);
 		} else if (type == PacketType.DeleteServer) {
 			GameManager.deleteServer(message);
+		} else if (type == PacketType.World) {
+			GameManager.world(message);
 		}
 	}
 }
