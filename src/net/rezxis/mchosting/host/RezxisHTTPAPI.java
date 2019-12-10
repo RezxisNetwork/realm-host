@@ -5,14 +5,13 @@ import java.io.FileOutputStream;
 
 import org.apache.commons.io.IOUtils;
 
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class RezxisHTTPAPI {
 
-private static OkHttpClient client;
+	private static OkHttpClient client;
 	
 	static {
 		client = new OkHttpClient.Builder().build();

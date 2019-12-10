@@ -41,6 +41,8 @@ public class WorkerThread extends Thread {
 			GameManager.deleteServer(message);
 		} else if (type == PacketType.World) {
 			GameManager.world(message);
+		} else if (type == PacketType.Backup) {
+			GameManager.backup(message);
 		}
 	}
 }

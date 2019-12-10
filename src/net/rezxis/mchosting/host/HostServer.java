@@ -3,6 +3,7 @@ package net.rezxis.mchosting.host;
 import java.net.URI;
 
 import net.rezxis.mchosting.databse.Database;
+import net.rezxis.mchosting.databse.tables.BackupsTable;
 import net.rezxis.mchosting.databse.tables.PlayersTable;
 import net.rezxis.mchosting.databse.tables.PluginsTable;
 import net.rezxis.mchosting.databse.tables.ServersTable;
@@ -15,6 +16,7 @@ public class HostServer {
 	public static ServersTable sTable;
 	public static PluginsTable plTable;
 	public static PlayersTable psTable;
+	public static BackupsTable bTable;
 	
 	public static void main(String[] args) {
 		props = new Props("host.propertis");
@@ -22,6 +24,7 @@ public class HostServer {
 		sTable = new ServersTable();
 		plTable = new PluginsTable();
 		psTable = new PlayersTable();
+		bTable = new BackupsTable();
 		try {
 			client = new WSClient(new URI(props.SYNC_ADDRESS),  new WSClientHandler());
 		} catch (Exception ex) {
