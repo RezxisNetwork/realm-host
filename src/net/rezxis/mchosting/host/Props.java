@@ -18,6 +18,10 @@ public class Props {
 	public final int MAX_SERVERS;
 	public final int HOST_ID;
 	public final String SYNC_ADDRESS;
+	public final int SYNC_PORT;
+	public final String DOCKER_ADDRESS;
+	public final int DOCKER_PORT;
+	public final String DOCKER_GATEWAY;
 	
 	final Properties prop=new Properties();
 	public Props(String fname) {
@@ -28,8 +32,6 @@ public class Props {
 			URL location = cs.getLocation();
 			URI uri = location.toURI();
 			Path path = Paths.get(uri);
-
-
 			istream = new FileInputStream(new File(new File(""+path).getParent(),fname));
 	        prop.load(istream);
 		} catch (Exception e) {
@@ -41,5 +43,9 @@ public class Props {
         SERVER_JAR_NAME = prop.getProperty("server_jar_name");
         HOST_ID = Integer.valueOf(prop.getProperty("host_id"));
         SYNC_ADDRESS = prop.getProperty("sync_address");
+        SYNC_PORT = Integer.valueOf(prop.getProperty("sync_port"));
+        DOCKER_ADDRESS = prop.getProperty("docker_address");
+        DOCKER_PORT = Integer.valueOf(prop.getProperty("docker_port"));
+        DOCKER_GATEWAY = prop.getProperty("docker_gateway");
 	}
 }

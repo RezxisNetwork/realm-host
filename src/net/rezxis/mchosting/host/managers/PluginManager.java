@@ -9,9 +9,9 @@ import java.util.HashMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
-import net.rezxis.mchosting.databse.DBPlugin;
-import net.rezxis.mchosting.databse.DBServer;
-import net.rezxis.mchosting.databse.Database;
+import net.rezxis.mchosting.database.DBPlugin;
+import net.rezxis.mchosting.database.DBServer;
+import net.rezxis.mchosting.database.Database;
 import net.rezxis.mchosting.host.HostServer;
 
 public class PluginManager {
@@ -55,12 +55,12 @@ public class PluginManager {
 			file.createNewFile();
 		}
 		PrintWriter pw = new PrintWriter(file);
-		pw.println("sync_address="+HostServer.props.SYNC_ADDRESS);
+		pw.println("sync_address="+"ws://"+HostServer.props.DOCKER_GATEWAY+":"+HostServer.props.SYNC_PORT);
 		pw.close();
 	}
 	private static void db(File file) throws Exception {
 		PrintWriter pw = new PrintWriter(file);
-		pw.println("db_host="+Database.getProps().DB_HOST);
+		pw.println("db_host="+HostServer.props.DOCKER_GATEWAY);
 		pw.println("db_user="+Database.getProps().DB_USER);
 		pw.println("db_pass="+Database.getProps().DB_PASS);
 		pw.println("db_port="+Database.getProps().DB_PORT);

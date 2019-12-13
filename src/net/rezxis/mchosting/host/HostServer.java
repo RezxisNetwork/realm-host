@@ -2,11 +2,12 @@ package net.rezxis.mchosting.host;
 
 import java.net.URI;
 
-import net.rezxis.mchosting.databse.Database;
-import net.rezxis.mchosting.databse.tables.BackupsTable;
-import net.rezxis.mchosting.databse.tables.PlayersTable;
-import net.rezxis.mchosting.databse.tables.PluginsTable;
-import net.rezxis.mchosting.databse.tables.ServersTable;
+import net.rezxis.mchosting.database.Database;
+import net.rezxis.mchosting.database.tables.BackupsTable;
+import net.rezxis.mchosting.database.tables.PlayersTable;
+import net.rezxis.mchosting.database.tables.PluginsTable;
+import net.rezxis.mchosting.database.tables.ServersTable;
+import net.rezxis.mchosting.host.managers.DockerManager;
 import net.rezxis.mchosting.network.WSClient;
 
 public class HostServer {
@@ -26,13 +27,19 @@ public class HostServer {
 		psTable = new PlayersTable();
 		bTable = new BackupsTable();
 		try {
-			client = new WSClient(new URI(props.SYNC_ADDRESS),  new WSClientHandler());
+			DockerManager.connect(props.DOCKER_ADDRESS, props.DOCKER_PORT);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.out.println("couldn't connect to docker.");
+			return;
+		}
+		try {
+			client = new WSClient(new URI("ws://"+props.SYNC_ADDRESS+":"+props.SYNC_PORT),  new WSClientHandler());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.out.println("failed to init websocket.");
 			return;
 		}
 		client.connect();
-		
 	}
 }
