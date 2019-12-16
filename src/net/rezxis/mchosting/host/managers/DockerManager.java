@@ -129,6 +129,7 @@ public class DockerManager {
 		portBindings.bind(eport, Ports.Binding.bindPort(port));
 		ArrayList<String> list = new ArrayList<>();
 		list.add("MAX_MEMORY="+player.getRank().getMem());
+		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+server.getID())
@@ -137,6 +138,7 @@ public class DockerManager {
 				.withExposedPorts(eport)
 				.withPortBindings(portBindings)
 				.withEnv(list)
+				//.withMemory(mem)
 				.exec();
 		ids.put(server.getID(), container.getId());
 		client.startContainerCmd(container.getId()).exec();
