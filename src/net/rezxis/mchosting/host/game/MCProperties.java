@@ -6,10 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import net.rezxis.mchosting.database.DBPlayer;
+import net.rezxis.mchosting.database.DBServer;
+
 public class MCProperties {
     final Properties properties = new Properties();
-    public MCProperties(String name,int port, String type, boolean cmd) {
-    	if (type.equalsIgnoreCase("void")) {
+    public MCProperties(DBServer server, DBPlayer player) {
+    	if (server.getWorld().equalsIgnoreCase("void")) {
     		properties.setProperty("generator-settings", "0;0;0;");
     	} else {
     		properties.setProperty("generator-settings", "");
@@ -20,13 +23,13 @@ public class MCProperties {
     	properties.setProperty("enable-query", "false");
     	properties.setProperty("allow-flight", "true");
     	properties.setProperty("prevent-proxy-connections", "false");
-    	properties.setProperty("server-port", String.valueOf(port));
+    	properties.setProperty("server-port", String.valueOf(server.getPort()));
     	properties.setProperty("max-world-size", "29999984");
-    	if (type.equalsIgnoreCase("default"))
+    	if (server.getWorld().equalsIgnoreCase("default"))
     		properties.setProperty("level-type", "DEFAULT");
-    	if (type.equalsIgnoreCase("flat"))
+    	if (server.getWorld().equalsIgnoreCase("flat"))
     		properties.setProperty("level-type", "FLAT");
-    	if (type.equalsIgnoreCase("void"))
+    	if (server.getWorld().equalsIgnoreCase("void"))
     		properties.setProperty("level-type", "FLAT");
     	properties.setProperty("enable-rcon","false");
     	properties.setProperty("level-seed", "");
@@ -41,19 +44,19 @@ public class MCProperties {
     	properties.setProperty("snooper-enabled", "true");
     	properties.setProperty("resource-pack-sha1", "");
     	properties.setProperty("online-mode", "false");
-    	properties.put("resource-pack=", "");
+    	properties.put("resource-pack", "");
     	properties.put("pvp", "true");
     	properties.setProperty("difficulty", "1");
-    	properties.setProperty("enable-command-block", String.valueOf(cmd));
+    	properties.setProperty("enable-command-block", String.valueOf(server.getCmd()));
     	properties.setProperty("gamemode", "0");
     	properties.setProperty("player-idle-timeout", "0");
-    	properties.setProperty("max-players", "10");
+    	properties.setProperty("max-players", String.valueOf(player.getRank().getMaxPlayers()));
     	properties.setProperty("spawn-monsters", "true");
     	properties.setProperty("generate-structures", "true");
     	properties.setProperty("view-distance", "10");
-    	properties.setProperty("motd",name);
+    	properties.setProperty("motd",server.getDisplayName());
     	properties.setProperty("spawn-protection", ""+0);
-    	properties.setProperty("server-name", name);
+    	properties.setProperty("server-name", server.getDisplayName());
     }
 
     public void generateFile(File gameDir) throws FileNotFoundException, IOException {

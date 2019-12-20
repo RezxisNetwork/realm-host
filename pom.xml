@@ -12,6 +12,7 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+          <Encoding>UTF-8</Encoding>
           <archive>
         	<manifest>
         		<mainClass>net.rezxis.mchosting.host.HostServer</mainClass>
@@ -43,6 +44,9 @@
       </plugin>
     </plugins>
   </build>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <dependencies>
   	<dependency>
   	  <groupId>net.rezxis.mchosting</groupId>

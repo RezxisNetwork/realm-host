@@ -14,6 +14,7 @@ import org.zeroturnaround.zip.ZipUtil;
 import com.google.gson.Gson;
 
 import net.rezxis.mchosting.database.DBBackup;
+import net.rezxis.mchosting.database.DBPlayer;
 import net.rezxis.mchosting.database.DBServer;
 import net.rezxis.mchosting.database.DBShop;
 import net.rezxis.mchosting.database.ServerStatus;
@@ -42,13 +43,14 @@ public class ServerFileManager {
 				UUID.fromString(createPacket.player), -1, new ArrayList<>(),
 				-1,ServerStatus.STOP,createPacket.world, HostServer.props.HOST_ID,
 				"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()),0);
+		DBPlayer player = HostServer.psTable.get(UUID.fromString(createPacket.player));
 		HostServer.sTable.insert(server);
 		ArrayList<String> array = new ArrayList<>();
 		array.add("ViaVersion");
 		server.setPlugins(array);
 		server.update();
 		new Thread(()->{
-			ServerFileUtil.generateServerFile(String.valueOf(server.getID()), 1, server.getWorld(), server.getCmd());
+			ServerFileUtil.generateServerFile(server,player);
 			SyncServerCreated packet = new SyncServerCreated(server.getOwner().toString());
 			HostServer.client.send(gson.toJson(packet));
 		}).start();

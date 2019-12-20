@@ -57,7 +57,8 @@ public class GameManager {
 	
 	private static void runServerIn(DBServer server, int port) {
 		try {
-			MCProperties props = new MCProperties(String.valueOf(server.getID()), currentPort, server.getWorld(), server.getCmd());
+			DBPlayer player = HostServer.psTable.get(server.getOwner());
+			MCProperties props = new MCProperties(server,player);
 			try {
 				props.generateFile(new File("servers/"+server.getID()));
 				PluginManager.checkPlugins(server);
@@ -66,7 +67,6 @@ public class GameManager {
 				System.out.println("couldn't initialize plugins.");
 				return;
 			}
-			DBPlayer player = HostServer.psTable.get(server.getOwner());
 			GameMaker gm = new GameMaker(new File(HostServer.props.SERVER_JAR_NAME),new File("servers/"+server.getID()), player.getRank().getMem());
 			gm.setMaxPlayer(player.getRank().getMaxPlayers());
 			gm.setPort(port);

@@ -22,16 +22,9 @@ public class PluginManager {
 		HashMap<String,DBPlugin> plugins = HostServer.plTable.getPlugins();
 		DBPlugin rezxisMC = plugins.get("RezxisMCHosting");
 		server.sync();
-		check(server, rezxisMC);
-		for (String p : server.getPlugins()) {
-			if (plugins.containsKey(p))
-				check(server, plugins.get(p));
-		}
 		File f = new File("servers/"+server.getID()+"/plugins/");
 		File db = new File(f,"database.propertis");
 		File sync = new File(f,"hosting.propertis");
-		db(db);
-		sync(sync);
 		ArrayList<DBPlugin> list = new ArrayList<DBPlugin>(plugins.values());
 		list.remove(rezxisMC);
 		for (String s : server.getPlugins()) {
@@ -41,13 +34,22 @@ public class PluginManager {
 		for (File file : f.listFiles()) {
 			for (DBPlugin p : list) {
 				if (file.getName().equalsIgnoreCase(p.getJarName())) {
-					file.delete();
+					FileUtils.forceDelete(file);
 				}
-				if (file.getName().contains(p.getName())) {
-					file.delete();
+				if (file.getName().equalsIgnoreCase(p.getName())) {
+					if (file.exists())
+						FileUtils.forceDelete(file);
 				}
 			}
 		}
+		check(server, rezxisMC);
+		for (String p : server.getPlugins()) {
+			if (plugins.containsKey(p))
+				check(server, plugins.get(p));
+		}
+		db(db);
+		sync(sync);
+		
 	}
 	
 	private static void sync(File file) throws Exception {

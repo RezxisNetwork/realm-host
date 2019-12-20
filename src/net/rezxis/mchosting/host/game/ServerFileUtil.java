@@ -5,14 +5,16 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 
+import net.rezxis.mchosting.database.DBPlayer;
+import net.rezxis.mchosting.database.DBServer;
 import net.rezxis.mchosting.host.HostServer;
 
 public class ServerFileUtil {
 
-	public static File generateServerFile(String serverName,int port,String type,boolean cmd)  {
+	public static File generateServerFile(DBServer server, DBPlayer player)  {
 		File base = new File(HostServer.props.BASE_DIR);
 		System.out.println(base.getAbsolutePath());
-		File gameDir = new File("servers/"+serverName);
+		File gameDir = new File("servers/"+server.getID());
 
 		if (!gameDir.exists()) {
 			gameDir.mkdirs();
@@ -22,7 +24,7 @@ public class ServerFileUtil {
 		}
 
 		copyDirectory(base,gameDir);
-		MCProperties mcprop=new MCProperties(serverName,port,type,cmd);
+		MCProperties mcprop = new MCProperties(server,player);
 		try {
 			mcprop.generateFile(gameDir);
 		}catch(Exception e) {

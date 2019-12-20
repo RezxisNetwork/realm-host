@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
+
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.DockerCmdExecFactory;
@@ -41,7 +43,6 @@ public class DockerManager {
 	public static void connect(String host, int port) {
 		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
 				  .withDockerHost("tcp://"+host+":"+port)
-				  
 				  .build();
 		DockerCmdExecFactory dockerCmdExecFactory = new JerseyDockerCmdExecFactory()
 				  .withConnectTimeout(1000)
@@ -60,6 +61,13 @@ public class DockerManager {
 			System.out.println("waited for 5s to start container for reboot server");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+		try {
+			PluginManager.checkPlugins(server);
+		} catch (Exception e) {
+			e.printStackTrace();
+			server.setStatus(ServerStatus.STOP);
+			server.update();
 		}
 		client.startContainerCmd(ids.get(server.getID())).exec();
 	}
@@ -83,6 +91,7 @@ public class DockerManager {
 			return;
 		}
 		client.killContainerCmd(ids.get(server.getID())).exec();
+		client.removeContainerCmd(ids.get(server.getID())).exec();
 		server.setStatus(ServerStatus.STOP);
 		server.setPlayers(0);
 		server.setPort(-1);
@@ -100,15 +109,18 @@ public class DockerManager {
 			System.out.println("There are no space to start server");
 			return;
 		}
+		DBPlayer player = HostServer.psTable.get(server.getOwner());
 		currentPort += 1;
 		final int port = currentPort;
 		server.setStatus(ServerStatus.STARTING);
 		server.setPort(port);
 		server.update();
-		MCProperties props = new MCProperties(String.valueOf(server.getID()), port, server.getWorld(), server.getCmd());
+		MCProperties props = new MCProperties(server,player);
 		try {
 			props.generateFile(new File("servers/"+server.getID()));
 			PluginManager.checkPlugins(server);
+			if (new File(new File("servers/"+server.getID()),"logs").exists())
+				FileUtils.forceDelete(new File(new File("servers/"+server.getID()),"logs"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("couldn't initialize plugins.");
@@ -116,7 +128,6 @@ public class DockerManager {
 			server.update();
 			return;
 		}
-		DBPlayer player = HostServer.psTable.get(server.getOwner());
 		GameMaker gm = new GameMaker(new File(HostServer.props.SERVER_JAR_NAME),new File("servers/"+server.getID()), player.getRank().getMem());
 		gm.setMaxPlayer(player.getRank().getMaxPlayers());
 		gm.setPort(port);
