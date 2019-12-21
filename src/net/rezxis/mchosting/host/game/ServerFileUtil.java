@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 
-import net.rezxis.mchosting.database.DBPlayer;
-import net.rezxis.mchosting.database.DBServer;
+import net.rezxis.mchosting.database.object.player.DBPlayer;
+import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.host.HostServer;
 
 public class ServerFileUtil {

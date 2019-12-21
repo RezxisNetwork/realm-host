@@ -6,9 +6,9 @@ import java.util.UUID;
 
 import com.google.gson.Gson;
 
-import net.rezxis.mchosting.database.DBPlayer;
-import net.rezxis.mchosting.database.DBServer;
-import net.rezxis.mchosting.database.ServerStatus;
+import net.rezxis.mchosting.database.object.player.DBPlayer;
+import net.rezxis.mchosting.database.object.server.DBServer;
+import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.game.GameMaker;
 import net.rezxis.mchosting.host.game.MCProperties;

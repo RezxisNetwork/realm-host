@@ -13,11 +13,11 @@ import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gson.Gson;
 
-import net.rezxis.mchosting.database.DBBackup;
-import net.rezxis.mchosting.database.DBPlayer;
-import net.rezxis.mchosting.database.DBServer;
-import net.rezxis.mchosting.database.DBShop;
-import net.rezxis.mchosting.database.ServerStatus;
+import net.rezxis.mchosting.database.object.internal.DBBackup;
+import net.rezxis.mchosting.database.object.player.DBPlayer;
+import net.rezxis.mchosting.database.object.server.DBServer;
+import net.rezxis.mchosting.database.object.server.DBShop;
+import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.RezxisHTTPAPI;
 import net.rezxis.mchosting.host.game.ServerFileUtil;

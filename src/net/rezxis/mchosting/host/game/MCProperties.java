@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import net.rezxis.mchosting.database.DBPlayer;
-import net.rezxis.mchosting.database.DBServer;
+import net.rezxis.mchosting.database.object.player.DBPlayer;
+import net.rezxis.mchosting.database.object.server.DBServer;
 
 public class MCProperties {
     final Properties properties = new Properties();

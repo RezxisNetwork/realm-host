@@ -9,9 +9,9 @@ import java.util.HashMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
-import net.rezxis.mchosting.database.DBPlugin;
-import net.rezxis.mchosting.database.DBServer;
 import net.rezxis.mchosting.database.Database;
+import net.rezxis.mchosting.database.object.server.DBPlugin;
+import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.host.HostServer;
 
 public class PluginManager {
@@ -34,7 +34,8 @@ public class PluginManager {
 		for (File file : f.listFiles()) {
 			for (DBPlugin p : list) {
 				if (file.getName().equalsIgnoreCase(p.getJarName())) {
-					FileUtils.forceDelete(file);
+					if (file.exists())
+						FileUtils.forceDelete(file);
 				}
 				if (file.getName().equalsIgnoreCase(p.getName())) {
 					if (file.exists())
