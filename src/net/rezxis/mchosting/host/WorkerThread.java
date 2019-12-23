@@ -1,23 +1,32 @@
 package net.rezxis.mchosting.host;
 
+import java.util.UUID;
+
 import com.google.gson.Gson;
 
-import net.rezxis.mchosting.host.managers.DockerManager;
-import net.rezxis.mchosting.host.managers.GameManager;
+import net.rezxis.mchosting.database.object.server.DBServer;
+import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.host.managers.ServerFileManager;
+import net.rezxis.mchosting.host.managers.games.CustomDockerManager;
+import net.rezxis.mchosting.host.managers.games.DockerManager;
+import net.rezxis.mchosting.host.managers.games.GameManager;
 import net.rezxis.mchosting.network.packet.Packet;
 import net.rezxis.mchosting.network.packet.PacketType;
 import net.rezxis.mchosting.network.packet.ServerType;
-import net.rezxis.mchosting.network.packet.host.HostWorldPacket;
+import net.rezxis.mchosting.network.packet.host.*;
 
 public class WorkerThread extends Thread {
 
 	private static Gson gson = new Gson();
+	public static DockerManager dMgr;
+	public static CustomDockerManager cMgr;
 	public String message;
 	
 	public WorkerThread(String json) {
 		this.message = json;
 	}
+	
+	//received=>getStatus(DBServer,DBPlayer)->query
 	
 	public void run() {
 		Packet packet = gson.fromJson(message, Packet.class);
@@ -33,20 +42,39 @@ public class WorkerThread extends Thread {
 			ServerFileManager.createServer(message);
 			//GameManager.createServer(message);
 		} else if (type == PacketType.StartServer) {
-			DockerManager.start(message);
-			//GameManager.startServer(message);
+			HostStartServer sp = gson.fromJson(message, HostStartServer.class);
+			DBServer server = HostServer.sTable.get(UUID.fromString(sp.player));
+			if (server.getType() == GameType.NORMAL) {
+				dMgr.start(server);
+			} else {
+				cMgr.start(server);
+			}
 		} else if (type == PacketType.StopServer) {
-			DockerManager.kill(message);
-			//GameManager.forceStop(message);
+			HostStopServer sp = gson.fromJson(message, HostStopServer.class);
+			DBServer server = HostServer.sTable.get(UUID.fromString(sp.player));
+			if (server.getType() == GameType.NORMAL) {
+				dMgr.kill(server);
+			} else {
+				cMgr.kill(server);
+			}
 		} else if (type == PacketType.ServerStopped) {
-			DockerManager.stopped(message);
-			//GameManager.stoppedServer();
+			HostStoppedServer sp = gson.fromJson(message, HostStoppedServer.class);
+			DBServer server = HostServer.sTable.get(UUID.fromString(sp.player));
+			if (server.getType() == GameType.NORMAL) {
+				dMgr.stopped(server);
+			} else {
+				cMgr.stopped(server);
+			}
 		} else if (type == PacketType.RebootServer) {
-			DockerManager.reboot(message);
-			//GameManager.rebootServer(message);
+			HostRebootServer sp = gson.fromJson(message, HostRebootServer.class);
+			DBServer server = HostServer.sTable.getByID(sp.id);
+			if (server.getType() == GameType.NORMAL) {
+				dMgr.reboot(server);
+			} else {
+				cMgr.reboot(server);
+			}
 		} else if (type == PacketType.DeleteServer) {
 			ServerFileManager.deleteServer(message);
-			//GameManager.deleteServer(message);
 		} else if (type == PacketType.World) {
 			ServerFileManager.world(message);
 		} else if (type == PacketType.Backup) {

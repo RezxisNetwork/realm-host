@@ -14,7 +14,7 @@ public class ServerFileUtil {
 	public static File generateServerFile(DBServer server, DBPlayer player)  {
 		File base = new File(HostServer.props.BASE_DIR);
 		System.out.println(base.getAbsolutePath());
-		File gameDir = new File("servers/"+server.getID());
+		File gameDir = new File("servers/"+server.getId());
 
 		if (!gameDir.exists()) {
 			gameDir.mkdirs();

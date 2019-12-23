@@ -1,4 +1,4 @@
-package net.rezxis.mchosting.host.managers;
+package net.rezxis.mchosting.host.managers.games;
 
 import java.io.File;
 import java.util.HashMap;
@@ -12,6 +12,7 @@ import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.game.GameMaker;
 import net.rezxis.mchosting.host.game.MCProperties;
+import net.rezxis.mchosting.host.managers.PluginManager;
 import net.rezxis.mchosting.network.packet.host.HostRebootServer;
 import net.rezxis.mchosting.network.packet.host.HostStartServer;
 import net.rezxis.mchosting.network.packet.host.HostStopServer;
@@ -60,23 +61,23 @@ public class GameManager {
 			DBPlayer player = HostServer.psTable.get(server.getOwner());
 			MCProperties props = new MCProperties(server,player);
 			try {
-				props.generateFile(new File("servers/"+server.getID()));
+				props.generateFile(new File("servers/"+server.getId()));
 				PluginManager.checkPlugins(server);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("couldn't initialize plugins.");
 				return;
 			}
-			GameMaker gm = new GameMaker(new File(HostServer.props.SERVER_JAR_NAME),new File("servers/"+server.getID()), player.getRank().getMem());
+			GameMaker gm = new GameMaker(new File(HostServer.props.SERVER_JAR_NAME),new File("servers/"+server.getId()), player.getRank().getMem());
 			gm.setMaxPlayer(player.getRank().getMaxPlayers());
 			gm.setPort(port);
 			server.setPort(port);
 			server.setPlayers(0);
 			server.update();
-			File logs = new File(new File("servers/"+server.getID()),"logs");
+			File logs = new File(new File("servers/"+server.getId()),"logs");
 			if (logs.exists())
 				logs.delete();
-			processes.put(server.getID(), gm.runProcess());
+			processes.put(server.getId(), gm.runProcess());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			server.setStatus(ServerStatus.STOP);
@@ -90,13 +91,13 @@ public class GameManager {
 		DBServer server = HostServer.sTable.get(UUID.fromString(packet.player));
 		if (server == null)
 			return;
-		if (!processes.containsKey(server.getID()))
+		if (!processes.containsKey(server.getId()))
 			return;
 		HostServer.client.send(gson.toJson(new SyncStoppedServer(server.getPort())));
 		server.setPort(-1);
 		server.setStatus(ServerStatus.STOP);
 		server.update();
 		runningServers -= 1;
-		processes.get(server.getID()).destroyForcibly();
+		processes.get(server.getId()).destroyForcibly();
 	}
 }

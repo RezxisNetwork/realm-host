@@ -2,12 +2,20 @@ package net.rezxis.mchosting.host;
 
 import java.net.URI;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.DockerCmdExecFactory;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientBuilder;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
+
 import net.rezxis.mchosting.database.Database;
 import net.rezxis.mchosting.database.tables.BackupsTable;
 import net.rezxis.mchosting.database.tables.PlayersTable;
 import net.rezxis.mchosting.database.tables.PluginsTable;
 import net.rezxis.mchosting.database.tables.ServersTable;
-import net.rezxis.mchosting.host.managers.DockerManager;
+import net.rezxis.mchosting.host.managers.games.CustomDockerManager;
+import net.rezxis.mchosting.host.managers.games.DockerManager;
 import net.rezxis.mchosting.network.WSClient;
 
 public class HostServer {
@@ -18,6 +26,10 @@ public class HostServer {
 	public static PluginsTable plTable;
 	public static PlayersTable psTable;
 	public static BackupsTable bTable;
+	public static DockerManager dManager;
+	public static CustomDockerManager cManager;
+	public static DockerClient dClient;
+	public static int currentPort = 27000;
 	
 	public static void main(String[] args) {
 		props = new Props("host.propertis");
@@ -26,13 +38,13 @@ public class HostServer {
 		plTable = new PluginsTable();
 		psTable = new PlayersTable();
 		bTable = new BackupsTable();
-		try {
-			DockerManager.connect(props.DOCKER_ADDRESS, props.DOCKER_PORT);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.out.println("couldn't connect to docker.");
-			return;
-		}
+		
+		// init server managers
+		dClient = connect(props.DOCKER_ADDRESS, props.DOCKER_PORT);
+		dManager = new DockerManager(dClient);
+		cManager = new CustomDockerManager(dClient);
+		WorkerThread.dMgr = dManager;
+		WorkerThread.cMgr = cManager;
 		try {
 			client = new WSClient(new URI("ws://"+props.SYNC_ADDRESS+":"+props.SYNC_PORT),  new WSClientHandler());
 		} catch (Exception ex) {
@@ -41,5 +53,18 @@ public class HostServer {
 			return;
 		}
 		client.connect();
+	}
+	
+	public static DockerClient connect(String host, int port) {
+		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
+				  .withDockerHost("tcp://"+host+":"+port)
+				  .build();
+		DockerCmdExecFactory dockerCmdExecFactory = new JerseyDockerCmdExecFactory()
+				  .withConnectTimeout(1000)
+				  .withMaxTotalConnections(100)
+				  .withMaxPerRouteConnections(10);
+		return DockerClientBuilder.getInstance(config)
+				  .withDockerCmdExecFactory(dockerCmdExecFactory)
+				  .build();
 	}
 }

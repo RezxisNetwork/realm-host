@@ -22,7 +22,7 @@ public class PluginManager {
 		HashMap<String,DBPlugin> plugins = HostServer.plTable.getPlugins();
 		DBPlugin rezxisMC = plugins.get("RezxisMCHosting");
 		server.sync();
-		File f = new File("servers/"+server.getID()+"/plugins/");
+		File f = new File("servers/"+server.getId()+"/plugins/");
 		File db = new File(f,"database.propertis");
 		File sync = new File(f,"hosting.propertis");
 		ArrayList<DBPlugin> list = new ArrayList<DBPlugin>(plugins.values());
@@ -72,7 +72,7 @@ public class PluginManager {
 	}
 	
 	private static void check(DBServer server, DBPlugin plugin) throws Exception {
-		File plugins = new File("servers/"+server.getID()+"/plugins/");//server plugins folder
+		File plugins = new File("servers/"+server.getId()+"/plugins/");//server plugins folder
 		File pFile = new File(plugins,plugin.getJarName());//dest plugin
 		File sFile = new File(pluginFolder, plugin.getJarName());//source plugin
 		if (!pFile.exists()) {//not copied plugin

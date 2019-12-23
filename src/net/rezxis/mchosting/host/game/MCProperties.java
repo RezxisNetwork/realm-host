@@ -47,7 +47,7 @@ public class MCProperties {
     	properties.put("resource-pack", "");
     	properties.put("pvp", "true");
     	properties.setProperty("difficulty", "1");
-    	properties.setProperty("enable-command-block", String.valueOf(server.getCmd()));
+    	properties.setProperty("enable-command-block", String.valueOf(server.isCmd()));
     	properties.setProperty("gamemode", "0");
     	properties.setProperty("player-idle-timeout", "0");
     	properties.setProperty("max-players", String.valueOf(player.getRank().getMaxPlayers()));

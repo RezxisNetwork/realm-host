@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import net.rezxis.mchosting.database.object.internal.DBBackup;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
 import net.rezxis.mchosting.database.object.server.DBServer;
+import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.database.object.server.DBShop;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.host.HostServer;
@@ -42,9 +43,14 @@ public class ServerFileManager {
 		DBServer server = new DBServer(-1, createPacket.displayName,
 				UUID.fromString(createPacket.player), -1, new ArrayList<>(),
 				-1,ServerStatus.STOP,createPacket.world, HostServer.props.HOST_ID,
-				"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()),0);
+				"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()),0,GameType.valueOf(createPacket.stype));
 		DBPlayer player = HostServer.psTable.get(UUID.fromString(createPacket.player));
 		HostServer.sTable.insert(server);
+		if (server.getType() == GameType.CUSTOM) {
+			SyncServerCreated packet = new SyncServerCreated(server.getOwner().toString());
+			HostServer.client.send(gson.toJson(packet));
+			return;
+		}
 		ArrayList<String> array = new ArrayList<>();
 		array.add("ViaVersion");
 		server.setPlugins(array);
@@ -92,7 +98,7 @@ public class ServerFileManager {
 		if (!isZipFile(cache)) {
 			return;
 		}
-		File dest = new File("servers/"+server.getID()+"/world");
+		File dest = new File("servers/"+server.getId()+"/world");
 		dest.delete();
 		dest.mkdir();
 		ZipUtil.unpack(cache, dest);
@@ -129,7 +135,7 @@ public class ServerFileManager {
 			server.update();
 			HostServer.bTable.insert(obj);
 			try {
-				ZipUtil.pack(new File("servers/"+server.getID()), new File("backups/"+obj.getId()+".zip"));
+				ZipUtil.pack(new File("servers/"+server.getId()), new File("backups/"+obj.getId()+".zip"));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -146,7 +152,7 @@ public class ServerFileManager {
 			DBBackup obj = HostServer.bTable.getBackupFromID(Integer.valueOf(packet.value.get("id")));
 			server.setStatus(ServerStatus.BACKUP);
 			server.update();
-			File sFile = new File("servers/"+server.getID());
+			File sFile = new File("servers/"+server.getId());
 			sFile.delete();
 			ZipUtil.unpack(new File("backups/"+obj.getId()+".zip"), sFile);
 			server.setStatus(ServerStatus.STOP);
