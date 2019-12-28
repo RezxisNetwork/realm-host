@@ -82,7 +82,13 @@ public class DockerManager implements IGame {
 			System.out.println("The target was not found");
 			return;
 		}
-		//client.killContainerCmd(ids.get(target.getId())).exec();
+		if (!ids.containsKey(target.getId())) {
+			target.setStatus(ServerStatus.STOP);
+			target.setPlayers(0);
+			target.setPort(-1);
+			target.update();
+			return;
+		}
 		client.removeContainerCmd(ids.get(target.getId())).exec();
 		target.setStatus(ServerStatus.STOP);
 		target.setPlayers(0);
