@@ -9,6 +9,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gson.Gson;
@@ -57,6 +58,14 @@ public class ServerFileManager {
 		server.update();
 		new Thread(()->{
 			ServerFileUtil.generateServerFile(server,player);
+			if (server.getType() == GameType.CUSTOM) {
+				try {
+					FileUtils.copyFile(new File("spigot/spigot.jar"), new File("servers/"+server.getId()+"/spigot.jar"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			SyncServerCreated packet = new SyncServerCreated(server.getOwner().toString());
 			HostServer.client.send(gson.toJson(packet));
 		}).start();
@@ -130,7 +139,7 @@ public class ServerFileManager {
 			if (!new File("backups").exists()) {
 				new File("backups").mkdirs();
 			}
-			DBBackup obj = new DBBackup(-1, HostServer.props.HOST_ID, packet.owner, packet.value.get("name"), new Date());
+			DBBackup obj = new DBBackup(-1, HostServer.props.HOST_ID, packet.owner, packet.value.get("name"), new Date(), server.getPlugins());
 			server.setStatus(ServerStatus.BACKUP);
 			server.update();
 			HostServer.bTable.insert(obj);
@@ -151,6 +160,7 @@ public class ServerFileManager {
 		} else if (packet.action == BackupAction.PATCH) {
 			DBBackup obj = HostServer.bTable.getBackupFromID(Integer.valueOf(packet.value.get("id")));
 			server.setStatus(ServerStatus.BACKUP);
+			server.setPlugins(obj.getPlugins());
 			server.update();
 			File sFile = new File("servers/"+server.getId());
 			sFile.delete();

@@ -14,8 +14,10 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.Network;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
+import com.google.gson.Gson;
 
 import net.rezxis.mchosting.database.object.player.DBPlayer;
 import net.rezxis.mchosting.database.object.server.DBServer;
@@ -23,6 +25,7 @@ import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.managers.IGame;
 import net.rezxis.mchosting.host.managers.PluginManager;
+import net.rezxis.mchosting.network.packet.sync.SyncCustomStarted;
 
 public class CustomDockerManager implements IGame {
 
@@ -86,6 +89,14 @@ public class CustomDockerManager implements IGame {
 		ids.put(target.getId(), container.getId());
 		client.startContainerCmd(container.getId()).exec();
 		updateSync(target,ServerStatus.RUNNING);
+		String ip = null;
+		for (Network net : client.listNetworksCmd().exec()) {
+			if (net.getName().equalsIgnoreCase("custom")) {
+				ip = net.getContainers().get(container.getId()).getIpv4Address();
+			}
+		}
+		SyncCustomStarted packet = new SyncCustomStarted(target.getId(),ip);
+		HostServer.client.send(new Gson().toJson(packet));
 	}
 
 	private void initProps(File dir,DBServer server) throws Exception {
