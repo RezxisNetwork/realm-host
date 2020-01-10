@@ -10,6 +10,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
 import net.rezxis.mchosting.database.Database;
+import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.server.DBPlugin;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.host.HostServer;
@@ -19,7 +20,7 @@ public class PluginManager {
 	public static final File pluginFolder = new File("plugins");
 	
 	public static void checkPlugins(DBServer server) throws Exception {
-		HashMap<String,DBPlugin> plugins = HostServer.plTable.getPlugins();
+		HashMap<String,DBPlugin> plugins = Tables.getPlTable().getPlugins();
 		DBPlugin rezxisMC = plugins.get("RezxisMCHosting");
 		server.sync();
 		File f = new File("servers/"+server.getId()+"/plugins/");
@@ -33,13 +34,15 @@ public class PluginManager {
 		}
 		for (File file : f.listFiles()) {
 			for (DBPlugin p : list) {
-				if (file.getName().equalsIgnoreCase(p.getJarName())) {
-					if (file.exists())
-						FileUtils.forceDelete(file);
-				}
-				if (file.getName().equalsIgnoreCase(p.getName())) {
-					if (file.exists())
-						FileUtils.forceDelete(file);
+				if (file.getName().endsWith(".jar")) {
+					if (file.getName().equalsIgnoreCase(p.getJarName())) {
+						if (file.exists())
+							FileUtils.forceDelete(file);
+					}
+					if (file.getName().equalsIgnoreCase(p.getName())) {
+						if (file.exists())
+							FileUtils.forceDelete(file);
+					}
 				}
 			}
 		}
@@ -48,8 +51,12 @@ public class PluginManager {
 			if (plugins.containsKey(p))
 				check(server, plugins.get(p));
 		}
-		db(db);
-		sync(sync);
+		if (db.exists())
+			db.delete();
+		if (sync.exists())
+			sync.delete();
+		//db(db);
+		//sync(sync);
 		
 	}
 	
@@ -64,10 +71,10 @@ public class PluginManager {
 	private static void db(File file) throws Exception {
 		PrintWriter pw = new PrintWriter(file);
 		pw.println("db_host="+HostServer.props.DOCKER_GATEWAY);
-		pw.println("db_user="+Database.getProps().DB_USER);
-		pw.println("db_pass="+Database.getProps().DB_PASS);
-		pw.println("db_port="+Database.getProps().DB_PORT);
-		pw.println("db_name="+Database.getProps().DB_NAME);
+		pw.println("db_user="+HostServer.props.DB_USER);
+		pw.println("db_pass="+HostServer.props.DB_PASS);
+		pw.println("db_port="+HostServer.props.DB_PORT);
+		pw.println("db_name="+HostServer.props.DB_NAME);
 		pw.close();
 	}
 	

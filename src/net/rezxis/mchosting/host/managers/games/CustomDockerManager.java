@@ -19,6 +19,7 @@ import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
 import com.google.gson.Gson;
 
+import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
@@ -64,15 +65,15 @@ public class CustomDockerManager implements IGame {
 			System.out.println("An exeception in init custom server file.");
 			return;
 		}
-		DBPlayer player = HostServer.psTable.get(target.getOwner());
+		DBPlayer player = Tables.getPTable().get(target.getOwner());
 		//create container and start - skid from DockerManager
 		Volume vol = new Volume("/data");
 		Bind bind = new Bind(new File("servers/"+target.getId()).getAbsolutePath(),vol);
 		int port = HostServer.currentPort;
 		HostServer.currentPort += 1;
-		ExposedPort eport = ExposedPort.tcp(port);
+		ExposedPort eport = ExposedPort.tcp(25565);
 		Ports bindings = new Ports();
-		bindings.bind(eport, Ports.Binding.bindPort(25565));
+		bindings.bind(eport, Ports.Binding.bindPort(port));
 		ArrayList<String> list = new ArrayList<>();
 		list.add("MAX_MEMORY="+player.getRank().getMem());
 		CreateContainerResponse container = client.createContainerCmd(imgName)
@@ -91,8 +92,8 @@ public class CustomDockerManager implements IGame {
 		updateSync(target,ServerStatus.RUNNING);
 		String ip = null;
 		for (Network net : client.listNetworksCmd().exec()) {
-			if (net.getName().equalsIgnoreCase("custom")) {
-				ip = net.getContainers().get(container.getId()).getIpv4Address();
+			if (net.getName().equalsIgnoreCase("bridge")) {
+				ip = net.getContainers().get(prefix+target.getId()).getIpv4Address();
 			}
 		}
 		SyncCustomStarted packet = new SyncCustomStarted(target.getId(),ip);
@@ -100,12 +101,21 @@ public class CustomDockerManager implements IGame {
 	}
 
 	private void initProps(File dir,DBServer server) throws Exception {
+		if (!dir.exists()) {
+			if (!dir.getParentFile().exists())
+				dir.getParentFile().mkdirs();
+			dir.createNewFile();
+		}
 		BufferedReader br = new BufferedReader(new FileReader(dir));
 		HashMap<String, String> values = new HashMap<>();
 		String line;
 		while ((line = br.readLine()) != null) {
-			if (!line.startsWith("#")) {
-				values.put(line.split("=")[0], line.split("=")[1]);
+			if (line.startsWith("=")) {
+				if (line.length() == 2) {
+					values.put(line.split("=")[0], line.split("=")[1]);
+				} else {
+					values.put(line.split("=")[0], "");
+				}
 			}
 		}
 		br.close();

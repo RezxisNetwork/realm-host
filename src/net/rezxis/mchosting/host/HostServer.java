@@ -22,10 +22,6 @@ public class HostServer {
 
 	public static Props props;
 	public static WSClient client;
-	public static ServersTable sTable;
-	public static PluginsTable plTable;
-	public static PlayersTable psTable;
-	public static BackupsTable bTable;
 	public static DockerManager dManager;
 	public static CustomDockerManager cManager;
 	public static DockerClient dClient;
@@ -33,12 +29,7 @@ public class HostServer {
 	
 	public static void main(String[] args) {
 		props = new Props("host.propertis");
-		Database.init();
-		sTable = new ServersTable();
-		plTable = new PluginsTable();
-		psTable = new PlayersTable();
-		bTable = new BackupsTable();
-		
+		Database.init(props.DB_HOST,props.DB_USER,props.DB_PASS,props.DB_PORT,props.DB_NAME);
 		// init server managers
 		dClient = connect(props.DOCKER_ADDRESS, props.DOCKER_PORT);
 		dManager = new DockerManager(dClient);

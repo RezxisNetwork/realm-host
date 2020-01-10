@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.google.gson.Gson;
 
+import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.host.managers.ServerFileManager;
@@ -14,6 +15,8 @@ import net.rezxis.mchosting.network.packet.Packet;
 import net.rezxis.mchosting.network.packet.PacketType;
 import net.rezxis.mchosting.network.packet.ServerType;
 import net.rezxis.mchosting.network.packet.host.*;
+import net.rezxis.mchosting.network.packet.sync.SyncThirdPartyPacket;
+import net.rezxis.mchosting.network.packet.sync.SyncThirdPartyPacket.Action;
 
 public class WorkerThread extends Thread {
 
@@ -43,7 +46,7 @@ public class WorkerThread extends Thread {
 			//GameManager.createServer(message);
 		} else if (type == PacketType.StartServer) {
 			HostStartServer sp = gson.fromJson(message, HostStartServer.class);
-			DBServer server = HostServer.sTable.get(UUID.fromString(sp.player));
+			DBServer server = Tables.getSTable().get(UUID.fromString(sp.player));
 			if (server.getType() == GameType.NORMAL) {
 				dMgr.start(server);
 			} else {
@@ -51,7 +54,7 @@ public class WorkerThread extends Thread {
 			}
 		} else if (type == PacketType.StopServer) {
 			HostStopServer sp = gson.fromJson(message, HostStopServer.class);
-			DBServer server = HostServer.sTable.get(UUID.fromString(sp.player));
+			DBServer server = Tables.getSTable().get(UUID.fromString(sp.player));
 			if (server.getType() == GameType.NORMAL) {
 				dMgr.kill(server);
 			} else {
@@ -59,7 +62,7 @@ public class WorkerThread extends Thread {
 			}
 		} else if (type == PacketType.ServerStopped) {
 			HostStoppedServer sp = gson.fromJson(message, HostStoppedServer.class);
-			DBServer server = HostServer.sTable.get(UUID.fromString(sp.player));
+			DBServer server = Tables.getSTable().get(UUID.fromString(sp.player));
 			if (server.getType() == GameType.NORMAL) {
 				dMgr.stopped(server);
 			} else {
@@ -67,7 +70,7 @@ public class WorkerThread extends Thread {
 			}
 		} else if (type == PacketType.RebootServer) {
 			HostRebootServer sp = gson.fromJson(message, HostRebootServer.class);
-			DBServer server = HostServer.sTable.getByID(sp.id);
+			DBServer server = Tables.getSTable().getByID(sp.id);
 			if (server.getType() == GameType.NORMAL) {
 				dMgr.reboot(server);
 			} else {

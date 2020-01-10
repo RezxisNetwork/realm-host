@@ -14,6 +14,7 @@ import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gson.Gson;
 
+import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.internal.DBBackup;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
 import net.rezxis.mchosting.database.object.server.DBServer;
@@ -37,7 +38,7 @@ public class ServerFileManager {
 	
 	public static void createServer(String json) {
 		HostCreateServer createPacket = gson.fromJson(json, HostCreateServer.class);
-		if (HostServer.sTable.get(UUID.fromString(createPacket.player)) != null) {
+		if (Tables.getSTable().get(UUID.fromString(createPacket.player)) != null) {
 			System.out.println("A server to tried to create has already depolyed");
 			return;
 		}
@@ -45,8 +46,8 @@ public class ServerFileManager {
 				UUID.fromString(createPacket.player), -1, new ArrayList<>(),
 				-1,ServerStatus.STOP,createPacket.world, HostServer.props.HOST_ID,
 				"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()),0,GameType.valueOf(createPacket.stype));
-		DBPlayer player = HostServer.psTable.get(UUID.fromString(createPacket.player));
-		HostServer.sTable.insert(server);
+		DBPlayer player = Tables.getPTable().get(UUID.fromString(createPacket.player));
+		Tables.getSTable().insert(server);
 		if (server.getType() == GameType.CUSTOM) {
 			SyncServerCreated packet = new SyncServerCreated(server.getOwner().toString());
 			HostServer.client.send(gson.toJson(packet));
@@ -93,7 +94,7 @@ public class ServerFileManager {
 		long time = System.currentTimeMillis();
 		String uuid = packet.values.get("uuid");
 		String secret = packet.values.get("secret");
-		DBServer server = HostServer.sTable.get(UUID.fromString(uuid));
+		DBServer server = Tables.getSTable().get(UUID.fromString(uuid));
 		File cacheDir = new File("cache");
 		if (!cacheDir.exists())
 			cacheDir.mkdirs();
@@ -130,7 +131,7 @@ public class ServerFileManager {
 	
 	public static void backup(String json) {
 		HostBackupPacket packet = gson.fromJson(json, HostBackupPacket.class);
-		DBServer server = HostServer.sTable.get(UUID.fromString(packet.owner));
+		DBServer server = Tables.getSTable().get(UUID.fromString(packet.owner));
 		if (server == null) {
 			System.out.print("received a backup request from no server.");
 			return;
@@ -142,7 +143,7 @@ public class ServerFileManager {
 			DBBackup obj = new DBBackup(-1, HostServer.props.HOST_ID, packet.owner, packet.value.get("name"), new Date(), server.getPlugins());
 			server.setStatus(ServerStatus.BACKUP);
 			server.update();
-			HostServer.bTable.insert(obj);
+			Tables.getBTable().insert(obj);
 			try {
 				ZipUtil.pack(new File("servers/"+server.getId()), new File("backups/"+obj.getId()+".zip"));
 			} catch (Exception ex) {
@@ -151,14 +152,14 @@ public class ServerFileManager {
 			server.setStatus(ServerStatus.STOP);
 			server.update();
 		} else if (packet.action == BackupAction.DELETE) {
-			DBBackup obj = HostServer.bTable.getBackupFromID(Integer.valueOf(packet.value.get("id")));
+			DBBackup obj = Tables.getBTable().getBackupFromID(Integer.valueOf(packet.value.get("id")));
 			File file = new File("backups/"+obj.getId()+".zip");
 			if (file.exists()) {
 				file.delete();
 			}
-			HostServer.bTable.delete(obj);
+			Tables.getBTable().delete(obj);
 		} else if (packet.action == BackupAction.PATCH) {
-			DBBackup obj = HostServer.bTable.getBackupFromID(Integer.valueOf(packet.value.get("id")));
+			DBBackup obj = Tables.getBTable().getBackupFromID(Integer.valueOf(packet.value.get("id")));
 			server.setStatus(ServerStatus.BACKUP);
 			server.setPlugins(obj.getPlugins());
 			server.update();

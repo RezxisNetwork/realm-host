@@ -63,6 +63,5 @@ public class MCProperties {
     	FileOutputStream fos = new FileOutputStream(new File(gameDir,"server.properties"));
         properties.store(fos, "Rezxis Realms");
         fos.close();
-        
     }
 }

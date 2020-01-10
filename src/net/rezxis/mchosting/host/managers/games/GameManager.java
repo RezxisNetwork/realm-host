@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.google.gson.Gson;
 
+import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
@@ -28,7 +29,7 @@ public class GameManager {
 	
 	public static void rebootServer(String json) {
 		HostRebootServer packet = gson.fromJson(json, HostRebootServer.class);
-		DBServer server = HostServer.sTable.getByID(packet.id);
+		DBServer server = Tables.getSTable().getByID(packet.id);
 		runServerIn(server, server.getPort());
 	}
 	
@@ -38,7 +39,7 @@ public class GameManager {
 	
 	public static void startServer(String json) {
 		HostStartServer packet = gson.fromJson(json, HostStartServer.class);
-		DBServer server = HostServer.sTable.get(UUID.fromString(packet.player));
+		DBServer server = Tables.getSTable().get(UUID.fromString(packet.player));
 		if (server == null) {
 			System.out.println("The server was not found");
 			return;
@@ -58,7 +59,7 @@ public class GameManager {
 	
 	private static void runServerIn(DBServer server, int port) {
 		try {
-			DBPlayer player = HostServer.psTable.get(server.getOwner());
+			DBPlayer player = Tables.getPTable().get(server.getOwner());
 			MCProperties props = new MCProperties(server,player);
 			try {
 				props.generateFile(new File("servers/"+server.getId()));
@@ -88,7 +89,7 @@ public class GameManager {
 	
 	public static void forceStop(String json) {
 		HostStopServer packet = gson.fromJson(json, HostStopServer.class);
-		DBServer server = HostServer.sTable.get(UUID.fromString(packet.player));
+		DBServer server = Tables.getSTable().get(UUID.fromString(packet.player));
 		if (server == null)
 			return;
 		if (!processes.containsKey(server.getId()))

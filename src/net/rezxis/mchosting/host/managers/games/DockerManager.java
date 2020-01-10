@@ -3,23 +3,17 @@ package net.rezxis.mchosting.host.managers.games;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.command.DockerCmdExecFactory;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
-import com.google.gson.Gson;
 
+import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
@@ -28,9 +22,6 @@ import net.rezxis.mchosting.host.game.GameMaker;
 import net.rezxis.mchosting.host.game.MCProperties;
 import net.rezxis.mchosting.host.managers.IGame;
 import net.rezxis.mchosting.host.managers.PluginManager;
-import net.rezxis.mchosting.network.packet.host.HostRebootServer;
-import net.rezxis.mchosting.network.packet.host.HostStartServer;
-import net.rezxis.mchosting.network.packet.host.HostStoppedServer;
 
 public class DockerManager implements IGame {
 
@@ -89,7 +80,7 @@ public class DockerManager implements IGame {
 			target.update();
 			return;
 		}
-		client.removeContainerCmd(ids.get(target.getId())).exec();
+		client.removeContainerCmd(ids.get(target.getId())).withForce(true).exec();
 		target.setStatus(ServerStatus.STOP);
 		target.setPlayers(0);
 		target.setPort(-1);
@@ -105,9 +96,9 @@ public class DockerManager implements IGame {
 			System.out.println("There are no space to start target");
 			return;
 		}
-		DBPlayer player = HostServer.psTable.get(target.getOwner());
-		HostServer.currentPort += 1;
+		DBPlayer player = Tables.getPTable().get(target.getOwner());
 		final int port = HostServer.currentPort;
+		HostServer.currentPort += 1;
 		target.setStatus(ServerStatus.STARTING);
 		target.setPort(port);
 		target.update();
@@ -136,6 +127,12 @@ public class DockerManager implements IGame {
 		portBindings.bind(eport, Ports.Binding.bindPort(port));
 		ArrayList<String> list = new ArrayList<>();
 		list.add("MAX_MEMORY="+player.getRank().getMem());
+		list.add("sync_address=ws://"+HostServer.props.DOCKER_GATEWAY+":"+HostServer.props.SYNC_PORT);
+		list.add("db_host="+HostServer.props.DOCKER_GATEWAY);
+		list.add("db_user="+HostServer.props.DB_USER);
+		list.add("db_pass="+HostServer.props.DB_PASS);
+		list.add("db_port="+HostServer.props.DB_PORT);
+		list.add("db_name="+HostServer.props.DB_NAME);
 		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
