@@ -133,6 +133,7 @@ public class DockerManager implements IGame {
 		list.add("db_pass="+HostServer.props.DB_PASS);
 		list.add("db_port="+HostServer.props.DB_PORT);
 		list.add("db_name="+HostServer.props.DB_NAME);
+		list.add("sowner="+target.getOwner().toString());
 		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
