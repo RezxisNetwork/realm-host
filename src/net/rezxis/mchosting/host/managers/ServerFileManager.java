@@ -9,7 +9,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gson.Gson;
@@ -116,11 +115,12 @@ public class ServerFileManager {
 		System.out.println("world upload takes "+(System.currentTimeMillis()-time)+"ms");
 	}
 	
+	@SuppressWarnings("resource")
 	private static boolean isZipFile(File f) {
         if (f.isDirectory())
             return false;
         try {
-            ZipFile file = new ZipFile(f);
+        	new ZipFile(f);
             return true;
         } catch (ZipException e) {
         } catch (IOException e) {

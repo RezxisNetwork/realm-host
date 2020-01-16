@@ -46,6 +46,7 @@ public class CustomDockerManager implements IGame {
 		instance = this;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void start(DBServer target) {
 		updateSync(target,ServerStatus.STARTING);

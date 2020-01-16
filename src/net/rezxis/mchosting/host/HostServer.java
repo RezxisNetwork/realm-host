@@ -10,10 +10,6 @@ import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
 
 import net.rezxis.mchosting.database.Database;
-import net.rezxis.mchosting.database.tables.BackupsTable;
-import net.rezxis.mchosting.database.tables.PlayersTable;
-import net.rezxis.mchosting.database.tables.PluginsTable;
-import net.rezxis.mchosting.database.tables.ServersTable;
 import net.rezxis.mchosting.host.managers.games.CustomDockerManager;
 import net.rezxis.mchosting.host.managers.games.DockerManager;
 import net.rezxis.mchosting.network.WSClient;
@@ -50,6 +46,7 @@ public class HostServer {
 		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
 				  .withDockerHost("tcp://"+host+":"+port)
 				  .build();
+		@SuppressWarnings("resource")
 		DockerCmdExecFactory dockerCmdExecFactory = new JerseyDockerCmdExecFactory()
 				  .withConnectTimeout(1000)
 				  .withMaxTotalConnections(100)

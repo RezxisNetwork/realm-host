@@ -2,18 +2,15 @@ package net.rezxis.mchosting.host.managers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
-import net.rezxis.mchosting.database.Database;
 import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.server.DBPlugin;
 import net.rezxis.mchosting.database.object.server.DBServer;
-import net.rezxis.mchosting.host.HostServer;
 
 public class PluginManager {
 
@@ -58,24 +55,6 @@ public class PluginManager {
 		//db(db);
 		//sync(sync);
 		
-	}
-	
-	private static void sync(File file) throws Exception {
-		if (!file.exists()) {
-			file.createNewFile();
-		}
-		PrintWriter pw = new PrintWriter(file);
-		pw.println("sync_address="+"ws://"+HostServer.props.DOCKER_GATEWAY+":"+HostServer.props.SYNC_PORT);
-		pw.close();
-	}
-	private static void db(File file) throws Exception {
-		PrintWriter pw = new PrintWriter(file);
-		pw.println("db_host="+HostServer.props.DOCKER_GATEWAY);
-		pw.println("db_user="+HostServer.props.DB_USER);
-		pw.println("db_pass="+HostServer.props.DB_PASS);
-		pw.println("db_port="+HostServer.props.DB_PORT);
-		pw.println("db_name="+HostServer.props.DB_NAME);
-		pw.close();
 	}
 	
 	private static void check(DBServer server, DBPlugin plugin) throws Exception {
