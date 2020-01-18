@@ -15,6 +15,7 @@ import com.github.dockerjava.api.model.Volume;
 
 import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
+import net.rezxis.mchosting.database.object.player.DBPlayer.Rank;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.host.HostServer;
@@ -89,11 +90,12 @@ public class DockerManager implements IGame {
 			System.out.println("The target was not found");
 			return;
 		}
-		if (runningServers() > HostServer.props.MAX_SERVERS) {
-			System.out.println("There are no space to start target");
-			return;
-		}
 		DBPlayer player = Tables.getPTable().get(target.getOwner());
+		if (player.getRank() != Rank.OWNER || player.getRank() != Rank.SPECIAL || player.getRank() != Rank.DEVELOPER)
+			if (runningServers() > HostServer.props.MAX_SERVERS) {
+				System.out.println("There are no space to start target");
+				return;
+			}
 		final int port = HostServer.currentPort;
 		HostServer.currentPort += 1;
 		target.setStatus(ServerStatus.STARTING);
