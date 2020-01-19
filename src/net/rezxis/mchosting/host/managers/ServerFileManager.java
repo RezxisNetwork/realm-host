@@ -20,6 +20,7 @@ import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.database.object.server.DBShop;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
+import net.rezxis.mchosting.database.object.server.ShopItem;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.RezxisHTTPAPI;
 import net.rezxis.mchosting.host.game.ServerFileUtil;
@@ -140,15 +141,19 @@ public class ServerFileManager {
 			if (!new File("backups").exists()) {
 				new File("backups").mkdirs();
 			}
-			DBBackup obj = new DBBackup(-1, HostServer.props.HOST_ID, packet.owner, packet.value.get("name"), new Date(), server.getPlugins());
 			server.setStatus(ServerStatus.BACKUP);
 			server.update();
+			for (ShopItem item : server.getShop().getItems()) {
+				item.setEarned(0);
+			}
+			DBBackup obj = new DBBackup(-1, HostServer.props.HOST_ID, packet.owner, packet.value.get("name"), new Date(), server.getPlugins(), gson.toJson(server.getShop()));
 			Tables.getBTable().insert(obj);
 			try {
 				ZipUtil.pack(new File("servers/"+server.getId()), new File("backups/"+obj.getId()+".zip"));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
+			server.sync();
 			server.setStatus(ServerStatus.STOP);
 			server.update();
 		} else if (packet.action == BackupAction.DELETE) {
@@ -162,6 +167,7 @@ public class ServerFileManager {
 			DBBackup obj = Tables.getBTable().getBackupFromID(Integer.valueOf(packet.value.get("id")));
 			server.setStatus(ServerStatus.BACKUP);
 			server.setPlugins(obj.getPlugins());
+			server.setShop(gson.fromJson(obj.getShop(), DBShop.class));
 			server.update();
 			File sFile = new File("servers/"+server.getId());
 			sFile.delete();
