@@ -9,8 +9,10 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
+import org.yaml.snakeyaml.Yaml;
 import org.zeroturnaround.zip.ZipUtil;
 
+import com.backblaze.b2.client.exceptions.B2Exception;
 import com.google.gson.Gson;
 
 import net.rezxis.mchosting.database.Tables;
@@ -21,6 +23,7 @@ import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.database.object.server.DBShop;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.database.object.server.ShopItem;
+import net.rezxis.mchosting.host.BackBlazeAPI;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.RezxisHTTPAPI;
 import net.rezxis.mchosting.host.game.ServerFileUtil;
@@ -53,6 +56,7 @@ public class ServerFileManager {
 			HostServer.client.send(gson.toJson(packet));
 			return;
 		}
+		
 		ArrayList<String> array = new ArrayList<>();
 		array.add("ViaVersion");
 		server.setPlugins(array);
@@ -146,21 +150,29 @@ public class ServerFileManager {
 			for (ShopItem item : server.getShop().getItems()) {
 				item.setEarned(0);
 			}
-			DBBackup obj = new DBBackup(-1, HostServer.props.HOST_ID, packet.owner, packet.value.get("name"), new Date(), server.getPlugins(), gson.toJson(server.getShop()));
+			DBBackup obj = new DBBackup(-1, packet.owner, packet.value.get("name"), new Date(), server.getPlugins(), gson.toJson(server.getShop()));
 			Tables.getBTable().insert(obj);
+			File dest = new File("backups/"+obj.getId()+".zip");
 			try {
-				ZipUtil.pack(new File("servers/"+server.getId()), new File("backups/"+obj.getId()+".zip"));
+				ZipUtil.pack(new File("servers/"+server.getId()), dest);
 			} catch (Exception ex) {
 				ex.printStackTrace();
+			}
+			try {
+				BackBlazeAPI.upload("rezxis-backup", obj.getId()+".zip", dest);
+				FileUtils.forceDelete(dest);
+			} catch (B2Exception | IOException e) {
+				e.printStackTrace();
 			}
 			server.sync();
 			server.setStatus(ServerStatus.STOP);
 			server.update();
 		} else if (packet.action == BackupAction.DELETE) {
 			DBBackup obj = Tables.getBTable().getBackupFromID(Integer.valueOf(packet.value.get("id")));
-			File file = new File("backups/"+obj.getId()+".zip");
-			if (file.exists()) {
-				file.delete();
+			try {
+				BackBlazeAPI.delete("rezxis-backup", obj.getId()+".zip");
+			} catch (B2Exception e) {
+				e.printStackTrace();
 			}
 			Tables.getBTable().delete(obj);
 		} else if (packet.action == BackupAction.PATCH) {
@@ -169,9 +181,17 @@ public class ServerFileManager {
 			server.setPlugins(obj.getPlugins());
 			server.setShop(gson.fromJson(obj.getShop(), DBShop.class));
 			server.update();
-			File sFile = new File("servers/"+server.getId());
-			sFile.delete();
-			ZipUtil.unpack(new File("backups/"+obj.getId()+".zip"), sFile);
+			File zip = new File("backups/"+obj.getId()+".zip");
+			try {
+				BackBlazeAPI.download("rezxis-backup", obj.getId()+".zip", zip);
+				File sFile = new File("servers/"+server.getId());
+				sFile.delete();
+				ZipUtil.unpack(zip, sFile);
+				FileUtils.forceDelete(zip);
+			} catch (B2Exception | IOException e) {
+				e.printStackTrace();
+			}
+			
 			server.setStatus(ServerStatus.STOP);
 			server.update();
 		}

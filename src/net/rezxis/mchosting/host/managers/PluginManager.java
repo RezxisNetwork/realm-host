@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.server.DBPlugin;
@@ -15,6 +16,7 @@ import net.rezxis.mchosting.database.object.server.DBServer;
 public class PluginManager {
 
 	public static final File pluginFolder = new File("plugins");
+	private static Yaml yaml = new Yaml();
 	
 	public static void checkPlugins(DBServer server) throws Exception {
 		HashMap<String,DBPlugin> plugins = Tables.getPlTable().getPlugins();
@@ -52,8 +54,6 @@ public class PluginManager {
 			db.delete();
 		if (sync.exists())
 			sync.delete();
-		//db(db);
-		//sync(sync);
 		
 	}
 	

@@ -48,6 +48,13 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
+ 	<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+	<dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.25</version>
+	</dependency>
+ 	
   	<dependency>
   	  <groupId>net.rezxis.mchosting</groupId>
   	  <artifactId>Database</artifactId>
@@ -59,10 +66,20 @@
   	  <version>0.0.1-SNAPSHOT</version>
   	</dependency>
   	<dependency>
+      <groupId>com.backblaze.b2</groupId>
+      <artifactId>b2-sdk-core</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.backblaze.b2</groupId>
+      <artifactId>b2-sdk-httpclient</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+  	<dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java</artifactId>
       <!-- use latest version https://github.com/docker-java/docker-java/releases -->
-      <version>3.2.0-rc2</version>
+      <version>3.2.0-rc3</version>
 	</dependency>
   	<dependency>
   		<groupId>org.java-websocket</groupId>
