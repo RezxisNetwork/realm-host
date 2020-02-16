@@ -66,6 +66,11 @@
   	  <version>0.0.1-SNAPSHOT</version>
   	</dependency>
   	<dependency>
+  	  <groupId>net.rezxis</groupId>
+  	  <artifactId>Rezxis-Utils</artifactId>
+  	  <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
       <groupId>com.backblaze.b2</groupId>
       <artifactId>b2-sdk-core</artifactId>
       <version>3.1.0</version>

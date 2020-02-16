@@ -9,7 +9,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
-import org.yaml.snakeyaml.Yaml;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.backblaze.b2.client.exceptions.B2Exception;
@@ -25,7 +24,6 @@ import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.database.object.server.ShopItem;
 import net.rezxis.mchosting.host.BackBlazeAPI;
 import net.rezxis.mchosting.host.HostServer;
-import net.rezxis.mchosting.host.RezxisHTTPAPI;
 import net.rezxis.mchosting.host.game.ServerFileUtil;
 import net.rezxis.mchosting.network.packet.enums.BackupAction;
 import net.rezxis.mchosting.network.packet.host.HostBackupPacket;
@@ -34,6 +32,7 @@ import net.rezxis.mchosting.network.packet.host.HostDeleteServer;
 import net.rezxis.mchosting.network.packet.host.HostWorldPacket;
 import net.rezxis.mchosting.network.packet.host.HostWorldPacket.Action;
 import net.rezxis.mchosting.network.packet.sync.SyncServerCreated;
+import net.rezxis.utils.WebAPI;
 
 public class ServerFileManager {
 
@@ -104,7 +103,7 @@ public class ServerFileManager {
 			cacheDir.mkdirs();
 		File cache = new File(cacheDir, uuid+"world.zip");
 		try {
-			RezxisHTTPAPI.download(cache, secret, uuid);
+			WebAPI.downloadWorld(cache, secret, uuid);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
