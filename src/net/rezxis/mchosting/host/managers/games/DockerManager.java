@@ -1,6 +1,7 @@
 package net.rezxis.mchosting.host.managers.games;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -67,6 +68,13 @@ public class DockerManager implements IGame {
 	public void stopped(DBServer target) {
 		client.removeContainerCmd(ids.get(target.getId())).withForce(true).exec();
 		ids.remove(target.getId());
+		if (new File(new File("servers/"+target.getId()),"logs").exists())
+			try {
+				FileUtils.forceDelete(new File(new File("servers/"+target.getId()),"logs"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 	
 	public void kill(DBServer target) {
@@ -105,8 +113,6 @@ public class DockerManager implements IGame {
 		try {
 			props.generateFile(new File("servers/"+target.getId()));
 			PluginManager.checkPlugins(target);
-			if (new File(new File("servers/"+target.getId()),"logs").exists())
-				FileUtils.forceDelete(new File(new File("servers/"+target.getId()),"logs"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("couldn't initialize plugins.");
