@@ -11,6 +11,8 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.LogConfig;
+import com.github.dockerjava.api.model.LogConfig.LoggingType;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
 
@@ -140,6 +142,9 @@ public class DockerManager implements IGame {
 		list.add("db_name="+HostServer.props.DB_NAME);
 		list.add("sowner="+target.getOwner().toString());
 		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
+		HashMap<String,String> logConfMap = new HashMap<>();
+		logConfMap.put("name", String.format("%:%", target.getOwner().toString(),target.getId()));
+		LogConfig logConfig = new LogConfig().setType(LoggingType.JSON_FILE).setConfig(logConfMap);
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
@@ -148,7 +153,7 @@ public class DockerManager implements IGame {
 				.withExposedPorts(eport)
 				.withPortBindings(portBindings)
 				.withEnv(list)
-				//.withMemory(mem)
+				.withLogConfig(logConfig)
 				.exec();
 		ids.put(target.getId(), container.getId());
 		client.startContainerCmd(container.getId()).exec();
