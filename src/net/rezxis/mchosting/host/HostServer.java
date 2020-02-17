@@ -44,7 +44,6 @@ public class HostServer {
 	
 	public static DockerClient connect(String host, int port) {
 		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-				  .withDockerHost("tcp://"+host+":"+port)
 				  .build();
 		@SuppressWarnings("resource")
 		DockerCmdExecFactory dockerCmdExecFactory = new JerseyDockerCmdExecFactory()
