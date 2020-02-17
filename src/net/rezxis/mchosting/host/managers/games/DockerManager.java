@@ -143,7 +143,7 @@ public class DockerManager implements IGame {
 		list.add("sowner="+target.getOwner().toString());
 		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
 		HashMap<String,String> logConfMap = new HashMap<>();
-		logConfMap.put("name", String.format("%:%", target.getOwner().toString(),target.getId()));
+		logConfMap.put("name", target.getOwner().toString());
 		LogConfig logConfig = new LogConfig().setType(LoggingType.JSON_FILE).setConfig(logConfMap);
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
