@@ -27,7 +27,7 @@ public class HostServer {
 		props = new Props("host.propertis");
 		Database.init(props.DB_HOST,props.DB_USER,props.DB_PASS,props.DB_PORT,props.DB_NAME);
 		// init server managers
-		dClient = connect(props.DOCKER_ADDRESS, props.DOCKER_PORT);
+		dClient = connect();
 		dManager = new DockerManager(dClient);
 		cManager = new CustomDockerManager(dClient);
 		WorkerThread.dMgr = dManager;
@@ -42,7 +42,7 @@ public class HostServer {
 		client.connect();
 	}
 	
-	public static DockerClient connect(String host, int port) {
+	public static DockerClient connect() {
 		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
 				  .build();
 		@SuppressWarnings("resource")

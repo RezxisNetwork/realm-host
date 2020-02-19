@@ -19,8 +19,6 @@ public class Props {
 	public final int HOST_ID;
 	public final String SYNC_ADDRESS;
 	public final int SYNC_PORT;
-	public final String DOCKER_ADDRESS;
-	public final int DOCKER_PORT;
 	public final String DOCKER_GATEWAY;
 	public final String DB_NAME;
 	public final String DB_HOST;
@@ -49,8 +47,6 @@ public class Props {
         HOST_ID = Integer.valueOf(prop.getProperty("host_id"));
         SYNC_ADDRESS = prop.getProperty("sync_address");
         SYNC_PORT = Integer.valueOf(prop.getProperty("sync_port"));
-        DOCKER_ADDRESS = prop.getProperty("docker_address");
-        DOCKER_PORT = Integer.valueOf(prop.getProperty("docker_port"));
         DOCKER_GATEWAY = prop.getProperty("docker_gateway");
         DB_HOST=prop.getProperty("db_host");
         DB_USER=prop.getProperty("db_user");
