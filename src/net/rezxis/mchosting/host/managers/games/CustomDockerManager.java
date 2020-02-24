@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
@@ -13,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Bind;
+import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Network;
 import com.github.dockerjava.api.model.Ports;
@@ -35,7 +37,6 @@ public class CustomDockerManager implements IGame {
 	
 	private static CustomDockerManager instance;
 	private DockerClient client;
-	private HashMap<Integer,String> ids = new HashMap<>();
 	
 	public static CustomDockerManager getInstance() {
 		return instance;
@@ -88,7 +89,6 @@ public class CustomDockerManager implements IGame {
 				//.withMemory(mem)
 				.exec();
 		
-		ids.put(target.getId(), container.getId());
 		client.startContainerCmd(container.getId()).exec();
 		updateSync(target,ServerStatus.RUNNING);
 		String ip = null;
@@ -131,8 +131,7 @@ public class CustomDockerManager implements IGame {
 	
 	@Override
 	public void stopped(DBServer target) {
-		client.removeContainerCmd(ids.get(target.getId())).withForce(true).exec();
-		ids.remove(target.getId());
+		client.removeContainerCmd(getConById(target.getId())).withForce(true).exec();
 	}
 
 	@Override
@@ -141,8 +140,8 @@ public class CustomDockerManager implements IGame {
 			System.out.println("The target was not found");
 			return;
 		}
-		client.killContainerCmd(ids.get(target.getId())).exec();
-		client.removeContainerCmd(ids.get(target.getId())).exec();
+		client.killContainerCmd(getConById(target.getId())).exec();
+		client.removeContainerCmd(getConById(target.getId())).exec();
 		target.setStatus(ServerStatus.STOP);
 		target.setPlayers(0);
 		target.setPort(-1);
@@ -164,11 +163,24 @@ public class CustomDockerManager implements IGame {
 			target.setStatus(ServerStatus.STOP);
 			target.update();
 		}
-		client.startContainerCmd(ids.get(target.getId())).exec();
+		client.startContainerCmd(getConById(target.getId())).exec();
 	}
 	
 	private void updateSync(DBServer s, ServerStatus t) {
 		s.setStatus(t);
 		s.update();
+	}
+	
+	private String getConById(int id) {
+		return this.getContainerIDByName(prefix+id);
+	}
+	
+	private String getContainerIDByName(String name) {
+		ArrayList<String> list = new ArrayList<>();
+		list.add(name);
+		List<Container> containers = client.listContainersCmd().withNameFilter(list).exec();
+		if (containers.size() == 0)
+			return null;
+		return containers.get(0).getId();
 	}
 }

@@ -40,6 +40,7 @@ public class HostServer {
 			return;
 		}
 		client.connect();
+		new Thread(new HealthCheckTask()).start();
 	}
 	
 	public static DockerClient connect() {

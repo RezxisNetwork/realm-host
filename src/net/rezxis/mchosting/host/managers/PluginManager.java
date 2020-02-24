@@ -63,6 +63,7 @@ public class PluginManager {
 		File sFile = new File(pluginFolder, plugin.getJarName());//source plugin
 		if (!pFile.exists()) {//not copied plugin
 			FileUtils.copyFile(sFile, pFile);
+			return;
 		}
 		FileInputStream fis = new FileInputStream(sFile);
 		String srcHash = DigestUtils.md5Hex(fis);
