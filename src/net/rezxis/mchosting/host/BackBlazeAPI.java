@@ -37,7 +37,6 @@ public class BackBlazeAPI {
         };
 	}
 	
-	
 	public static void delete(String bucketName, String fileName) throws B2Exception {
 		B2FileVersion file = client.getFileInfoByName(bucketName, fileName);
 		client.deleteFileVersion(file);
