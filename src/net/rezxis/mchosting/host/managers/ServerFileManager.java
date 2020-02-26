@@ -11,7 +11,6 @@ import java.util.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.zeroturnaround.zip.ZipUtil;
 
-import com.backblaze.b2.client.exceptions.B2Exception;
 import com.google.gson.Gson;
 
 import net.rezxis.mchosting.database.Tables;
@@ -22,7 +21,6 @@ import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.database.object.server.DBShop;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.database.object.server.ShopItem;
-import net.rezxis.mchosting.host.BackBlazeAPI;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.game.ServerFileUtil;
 import net.rezxis.mchosting.network.packet.enums.BackupAction;
