@@ -151,7 +151,6 @@ public class DockerManager implements IGame {
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
-				.withTty(true)
 				.withBinds(bindSpigot,bindServer)
 				.withExposedPorts(eport)
 				.withPortBindings(portBindings)
