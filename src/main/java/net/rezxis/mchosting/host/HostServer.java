@@ -39,8 +39,8 @@ public class HostServer {
 			System.out.println("failed to init websocket.");
 			return;
 		}
-		client.connect();
 		new Thread(new HealthCheckTask()).start();
+		client.connect();
 	}
 	
 	public static DockerClient connect() {

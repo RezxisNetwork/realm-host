@@ -148,9 +148,6 @@ public class DockerManager implements IGame {
 		list.add("TZ=Asia/Tokyo");
 		list.add("sowner="+target.getOwner().toString());
 		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
-		HashMap<String,String> logConfMap = new HashMap<>();
-		logConfMap.put("tag", target.getOwner().toString());
-		LogConfig logConfig = new LogConfig().setType(LoggingType.JSON_FILE).setConfig(logConfMap);
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
@@ -159,7 +156,6 @@ public class DockerManager implements IGame {
 				.withExposedPorts(eport)
 				.withPortBindings(portBindings)
 				.withEnv(list)
-				.withLogConfig(logConfig)
 				.exec();
 		client.startContainerCmd(container.getId()).exec();
 	}

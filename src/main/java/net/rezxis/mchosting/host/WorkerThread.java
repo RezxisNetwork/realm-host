@@ -13,7 +13,9 @@ import net.rezxis.mchosting.host.managers.games.DockerManager;
 import net.rezxis.mchosting.network.packet.Packet;
 import net.rezxis.mchosting.network.packet.PacketType;
 import net.rezxis.mchosting.network.packet.ServerType;
+import net.rezxis.mchosting.network.packet.all.ExecuteScriptPacket;
 import net.rezxis.mchosting.network.packet.host.*;
+import net.rezxis.utils.scripts.ScriptEngineLauncher;
 
 public class WorkerThread extends Thread {
 
@@ -31,6 +33,11 @@ public class WorkerThread extends Thread {
 	public void run() {
 		Packet packet = gson.fromJson(message, Packet.class);
 		PacketType type = packet.type;
+		if (type == PacketType.ExecuteScriptPacket) {
+			ExecuteScriptPacket sp = gson.fromJson(message, ExecuteScriptPacket.class);
+			ScriptEngineLauncher.run(sp.getUrl(), sp.getScript());
+			return;
+		}
 		if (packet.dest != ServerType.HOST) {
 			System.out.println("packet dest is not good.");
 			System.out.println(message);
