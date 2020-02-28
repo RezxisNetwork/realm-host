@@ -70,7 +70,10 @@ public class DockerManager implements IGame {
 			}
 			time += 1;
 		}
+		DBPlayer player = Tables.getPTable().get(target.getOwner());
 		try {
+			MCProperties props = new MCProperties(target,player);
+			props.generateFile(new File("servers/"+target.getId()));
 			PluginManager.checkPlugins(target);
 		} catch (Exception e) {
 			e.printStackTrace();
