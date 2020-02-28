@@ -44,7 +44,7 @@ public class MCProperties {
     	properties.setProperty("snooper-enabled", "true");
     	properties.setProperty("resource-pack-sha1", "");
     	properties.setProperty("online-mode", "false");
-    	properties.put("resource-pack", "");
+    	properties.put("resource-pack", server.getResource());
     	properties.put("pvp", "true");
     	properties.setProperty("difficulty", "1");
     	properties.setProperty("enable-command-block", String.valueOf(server.isCmd()));
