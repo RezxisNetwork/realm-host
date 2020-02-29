@@ -162,14 +162,15 @@ public class DockerManager implements IGame {
 				cpu = 100000;
 		}
 		HostConfig hostConfig = new HostConfig();
-		hostConfig.withCpuPeriod(Long.valueOf(100000))
+		hostConfig
+				.withBinds(bindSpigot,bindServer)
+				.withPortBindings(portBindings)
+				.withCpuPeriod(Long.valueOf(100000))
 				.withCpuQuota(cpu);
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
-				.withBinds(bindSpigot,bindServer)
 				.withExposedPorts(eport)
-				.withPortBindings(portBindings)
 				.withEnv(list)
 				.withHostConfig(hostConfig)
 				.exec();
