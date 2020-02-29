@@ -151,6 +151,25 @@ public class DockerManager implements IGame {
 		list.add("TZ=Asia/Tokyo");
 		list.add("sowner="+target.getOwner().toString());
 		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
+		int cpu = 1024;
+		switch (player.getRank()) {
+		case NORMAL:
+			cpu = 1024;
+		case GOLD:
+			cpu = 1024*2;
+		case DIAMOND:
+			cpu = 1024*3;
+		case EMERALD:
+			cpu = 0;
+		case SPECIAL:
+			cpu = 0;
+		case DEVELOPER:
+			cpu = 0;
+		case STAFF:
+			cpu = 0;
+		case OWNER:
+			cpu = 0;
+		}
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
@@ -158,6 +177,7 @@ public class DockerManager implements IGame {
 				.withExposedPorts(eport)
 				.withPortBindings(portBindings)
 				.withEnv(list)
+				.withCpuShares(cpu)
 				.exec();
 		client.startContainerCmd(container.getId()).exec();
 	}
