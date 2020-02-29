@@ -163,6 +163,8 @@ public class DockerManager implements IGame {
 			cpu = "2.5";
 		case SPECIAL:
 			cpu = "3";
+		default:
+			cpu = "1";
 		}
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
