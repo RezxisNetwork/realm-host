@@ -6,17 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.github.dockerjava.api.model.*;
 import org.apache.commons.io.FileUtils;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.model.Bind;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.LogConfig;
 import com.github.dockerjava.api.model.LogConfig.LoggingType;
-import com.github.dockerjava.api.model.Ports;
-import com.github.dockerjava.api.model.Volume;
 
 import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
@@ -151,21 +146,24 @@ public class DockerManager implements IGame {
 		list.add("TZ=Asia/Tokyo");
 		list.add("sowner="+target.getOwner().toString());
 		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
-		String cpu = "0";
+		long cpu = 0;
 		switch (player.getRank()) {
-		case NORMAL:
-			cpu = "1";
-		case GOLD:
-			cpu = "1.5";
-		case DIAMOND:
-			cpu = "2";
-		case EMERALD:
-			cpu = "2.5";
-		case SPECIAL:
-			cpu = "3";
-		default:
-			cpu = "1";
+			case NORMAL:
+				cpu = 100000;
+			case GOLD:
+				cpu = 150000;
+			case DIAMOND:
+				cpu = 200000;
+			case EMERALD:
+				cpu = 250000;
+			case SPECIAL:
+				cpu = 300000;
+			default:
+				cpu = 100000;
 		}
+		HostConfig hostConfig = new HostConfig();
+		hostConfig.withCpuPeriod(Long.valueOf(100000))
+				.withCpuQuota(cpu);
 		CreateContainerResponse container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
@@ -173,7 +171,7 @@ public class DockerManager implements IGame {
 				.withExposedPorts(eport)
 				.withPortBindings(portBindings)
 				.withEnv(list)
-				.withCpusetCpus(cpu)
+				.withHostConfig(hostConfig)
 				.exec();
 		client.startContainerCmd(container.getId()).exec();
 	}
