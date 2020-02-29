@@ -156,13 +156,13 @@ public class DockerManager implements IGame {
 		case NORMAL:
 			cpu = 1024;
 		case GOLD:
-			cpu = 1024*2;
+			cpu = 1024*(3/2);
 		case DIAMOND:
-			cpu = 1024*3;
+			cpu = 1024*2;
 		case EMERALD:
-			cpu = 0;
+			cpu = 1024*(5/2);
 		case SPECIAL:
-			cpu = 0;
+			cpu = 1024*3;
 		case DEVELOPER:
 			cpu = 0;
 		case STAFF:
