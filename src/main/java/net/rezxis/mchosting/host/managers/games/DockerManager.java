@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.LogConfig.LoggingType;
+import com.google.gson.Gson;
 
 import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
@@ -23,6 +24,7 @@ import net.rezxis.mchosting.host.game.GameMaker;
 import net.rezxis.mchosting.host.game.MCProperties;
 import net.rezxis.mchosting.host.managers.IGame;
 import net.rezxis.mchosting.host.managers.PluginManager;
+import net.rezxis.mchosting.network.packet.sync.SyncPlayerMessagePacket;
 import net.rezxis.utils.WebAPI;
 import net.rezxis.utils.WebAPI.DiscordWebHookEnum;
 
@@ -41,6 +43,7 @@ public class DockerManager implements IGame {
 	
 	private final static String prefix = "container";
 	private final static String imgName = "rezxis/rzmc:latest";
+	private static Gson gson = new Gson();
 	
 	public DockerClient client;
 	
@@ -104,9 +107,10 @@ public class DockerManager implements IGame {
 	@SuppressWarnings("deprecation")
 	public void start(DBServer target) {
 		DBPlayer player = Tables.getPTable().get(target.getOwner());
-		if (player.getRank() != Rank.OWNER || player.getRank() != Rank.SPECIAL || player.getRank() != Rank.DEVELOPER)
+		if (player.getRank() != Rank.OWNER || player.getRank() != Rank.SPECIAL || player.getRank() != Rank.DEVELOPER || !player.isSupporter())
 			if (runningServers() > HostServer.props.MAX_SERVERS) {
 				System.out.println("There are no space to start target");
+				HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&aサーバーの起動上限に到達しているので、起動できません。")));
 				return;
 			}
 		final int port = HostServer.currentPort;
@@ -121,6 +125,7 @@ public class DockerManager implements IGame {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("couldn't initialize plugins.");
+			HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&a内部エラーが発生したので、起動できません。Ticketで連絡してください。")));
 			target.setStatus(ServerStatus.STOP);
 			target.update();
 			return;
@@ -167,14 +172,30 @@ public class DockerManager implements IGame {
 				.withPortBindings(portBindings)
 				.withCpuPeriod(Long.valueOf(100000))
 				.withCpuQuota(cpu);
-		CreateContainerResponse container = client.createContainerCmd(imgName)
+		CreateContainerResponse container = null;
+		try {
+			container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
 				.withExposedPorts(eport)
 				.withEnv(list)
 				.withHostConfig(hostConfig)
 				.exec();
-		client.startContainerCmd(container.getId()).exec();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&a内部エラーが発生したため、起動できません。再度試しても起動できない場合、Ticketで連絡してください。")));
+			target.setStatus(ServerStatus.STOP);
+			target.update();
+			return;
+		}
+		try {
+			client.startContainerCmd(container.getId()).exec();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&a内部エラーが発生したため、起動できません。再度試しても起動できない場合、Ticketで連絡してください。")));
+			target.setStatus(ServerStatus.STOP);
+			target.update();
+		}
 	}
 	
 	private String getConById(int id) {
