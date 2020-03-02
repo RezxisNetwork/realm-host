@@ -107,11 +107,13 @@ public class DockerManager implements IGame {
 	@SuppressWarnings("deprecation")
 	public void start(DBServer target) {
 		DBPlayer player = Tables.getPTable().get(target.getOwner());
-		if (player.getRank() != Rank.OWNER || player.getRank() != Rank.SPECIAL || player.getRank() != Rank.DEVELOPER || !player.isSupporter())
+		if (player.getRank() != Rank.OWNER || player.getRank() != Rank.SPECIAL || player.getRank() != Rank.DEVELOPER )
 			if (runningServers() > HostServer.props.MAX_SERVERS) {
-				System.out.println("There are no space to start target");
-				HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&aサーバーの起動上限に到達しているので、起動できません。")));
-				return;
+				if (!player.isSupporter()) {
+					System.out.println("There are no space to start target");
+					HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&aサーバーの起動上限に到達しているので、起動できません。")));
+					return;
+				}
 			}
 		final int port = HostServer.currentPort;
 		HostServer.currentPort += 1;
