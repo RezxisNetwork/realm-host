@@ -85,12 +85,12 @@ public class DockerManager implements IGame {
 	
 	public void stopped(DBServer target) {
 		client.removeContainerCmd(getConById(target.getId())).withForce(true).exec();
-		/*if (new File(new File("servers/"+target.getId()),"logs").exists())
+		if (new File(new File("servers/"+target.getId()),"logs").exists())
 			try {
 				FileUtils.forceDelete(new File(new File("servers/"+target.getId()),"logs"));
 			} catch (IOException e) {
 				e.printStackTrace();
-			}*/
+			}
 	}
 	
 	public void kill(DBServer target) {
