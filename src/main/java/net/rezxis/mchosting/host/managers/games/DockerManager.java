@@ -189,6 +189,10 @@ public class DockerManager implements IGame {
 			HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&a内部エラーが発生したため、起動できません。再度試しても起動できない場合、Ticketで連絡してください。")));
 			target.setStatus(ServerStatus.STOP);
 			target.update();
+			String id = getConById(target.getId());
+			if (id != null) {
+				client.removeContainerCmd(id).withForce(true).exec();
+			}
 			return;
 		}
 		try {
@@ -198,6 +202,10 @@ public class DockerManager implements IGame {
 			HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&a内部エラーが発生したため、起動できません。再度試しても起動できない場合、Ticketで連絡してください。")));
 			target.setStatus(ServerStatus.STOP);
 			target.update();
+			String id = getConById(target.getId());
+			if (id != null) {
+				client.removeContainerCmd(id).withForce(true).exec();
+			}
 		}
 	}
 	
