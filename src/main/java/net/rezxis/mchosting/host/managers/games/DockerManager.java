@@ -144,8 +144,8 @@ public class DockerManager implements IGame {
 		portBindings.bind(eport, Ports.Binding.bindPort(port));
 		ArrayList<String> list = new ArrayList<>();
 		list.add("MAX_MEMORY="+player.getRank().getMem());
-		list.add("sync_address=ws://"+HostServer.props.DOCKER_GATEWAY+":"+HostServer.props.SYNC_PORT);
-		list.add("db_host="+HostServer.props.DOCKER_GATEWAY);
+		list.add("sync_address=ws://"+HostServer.props.CHILD_SYNC+":"+HostServer.props.SYNC_PORT);
+		list.add("db_host="+HostServer.props.CHILD_DB);
 		list.add("db_user="+HostServer.props.DB_USER);
 		list.add("db_pass="+HostServer.props.DB_PASS);
 		list.add("db_port="+HostServer.props.DB_PORT);
