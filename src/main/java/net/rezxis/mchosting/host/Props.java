@@ -16,6 +16,7 @@ public class Props {
 	public final String SERVER_JAR_NAME;
 	public final boolean USE_WINDOW;
 	public final int MAX_SERVERS;
+	public final boolean CPULIMIT;
 	public final int HOST_ID;
 	public final String SYNC_ADDRESS;
 	public final int SYNC_PORT;
@@ -55,5 +56,6 @@ public class Props {
         DB_PASS=prop.getProperty("db_pass");
         DB_PORT=prop.getProperty("db_port");
         DB_NAME=prop.getProperty("db_name");
+        CPULIMIT=Boolean.parseBoolean(prop.getProperty("cpulimit"));
 	}
 }
