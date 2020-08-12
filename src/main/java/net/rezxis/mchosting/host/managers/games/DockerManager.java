@@ -79,8 +79,6 @@ public class DockerManager implements IGame {
 			return;
 		}
 		client.startContainerCmd(id).exec();
-		target.setIp(client.inspectContainerCmd(id).exec().getNetworkSettings().getIpAddress());
-		target.update();
 	}
 	
 	public void stopped(DBServer target) {
@@ -198,6 +196,8 @@ public class DockerManager implements IGame {
 		}
 		try {
 			client.startContainerCmd(container.getId()).exec();
+			target.setIp(client.inspectContainerCmd(container.getId()).exec().getNetworkSettings().getIpAddress());
+			target.update();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(target.getOwner(),"&a内部エラーが発生したため、起動できません。再度試しても起動できない場合、Ticketで連絡してください。")));
