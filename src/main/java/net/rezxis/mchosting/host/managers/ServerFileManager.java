@@ -110,12 +110,44 @@ public class ServerFileManager {
 		if (!isZipFile(cache)) {
 			return;
 		}
-		File dest = new File("servers/"+server.getId()+"/world");
-		dest.delete();
-		dest.mkdir();
-		ZipUtil.unpack(cache, dest);
-		cache.delete();
-		System.out.println("world upload takes "+(System.currentTimeMillis()-time)+"ms");
+		try {
+			File tmp = new File("cache/"+server.getId()+"/world");
+			if (tmp.exists())
+				FileUtils.forceDelete(tmp);
+			tmp.mkdirs();
+			ZipUtil.unpack(cache, tmp);
+			String f = checkBlackListed(tmp);
+			if (f != null) {
+				System.out.println(uuid+" : blacklisted file was detected!");
+				HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(UUID.fromString(uuid),"&a禁止された拡張子のfileが検出されました。")));
+				return;
+			}
+			
+			File dest = new File("servers/"+server.getId()+"/world");
+			dest.delete();
+			FileUtils.moveDirectory(tmp, dest);
+			
+			cache.delete();
+			System.out.println("world upload takes "+(System.currentTimeMillis()-time)+"ms");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	private static String checkBlackListed(File t) {
+		String[] ex = new String[] {"class","jar","zip"};
+		for (File file : t.listFiles()) {
+			if (file.isDirectory()) {
+				return checkBlackListed(file);
+			} else {
+				for (String s : ex) {
+					if (file.getName().toLowerCase().endsWith(s)) {
+						return file.getName();
+					}
+				}
+			}
+		}
+		return null;
 	}
 	
 	@SuppressWarnings("resource")
