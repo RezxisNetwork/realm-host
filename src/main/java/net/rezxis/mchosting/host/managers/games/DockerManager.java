@@ -3,7 +3,6 @@ package net.rezxis.mchosting.host.managers.games;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import com.github.dockerjava.api.model.*;
@@ -11,7 +10,6 @@ import org.apache.commons.io.FileUtils;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.model.LogConfig.LoggingType;
 import com.google.gson.Gson;
 
 import net.rezxis.mchosting.database.Tables;
@@ -104,7 +102,6 @@ public class DockerManager implements IGame {
 		WebAPI.webhook(DiscordWebHookEnum.PRIVATE, String.format("killed a server ID : %s , UUID : %s", target.getId(), target.getOwner().toString()));
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void start(DBServer target) {
 		DBPlayer player = Tables.getPTable().get(target.getOwner());
 		if (player.getRank() != Rank.OWNER || player.getRank() != Rank.SPECIAL || player.getRank() != Rank.DEVELOPER )
