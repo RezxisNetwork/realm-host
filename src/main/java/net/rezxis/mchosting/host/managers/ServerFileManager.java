@@ -124,7 +124,7 @@ public class ServerFileManager {
 			}
 			
 			File dest = new File("servers/"+server.getId()+"/world");
-			dest.delete();
+			FileUtils.forceDelete(dest);
 			FileUtils.moveDirectory(tmp, dest);
 			
 			cache.delete();
