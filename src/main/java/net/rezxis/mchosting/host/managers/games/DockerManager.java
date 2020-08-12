@@ -79,6 +79,8 @@ public class DockerManager implements IGame {
 			return;
 		}
 		client.startContainerCmd(id).exec();
+		target.setIp(client.inspectContainerCmd(id).exec().getNetworkSettings().getIpAddress());
+		target.update();
 	}
 	
 	public void stopped(DBServer target) {
