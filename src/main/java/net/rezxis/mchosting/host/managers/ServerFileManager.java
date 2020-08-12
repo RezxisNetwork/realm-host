@@ -119,7 +119,7 @@ public class ServerFileManager {
 			String f = checkBlackListed(tmp);
 			if (f != null) {
 				System.out.println(uuid+" : blacklisted file was detected!");
-				HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(UUID.fromString(uuid),"&a禁止された拡張子のfileが検出されました。")));
+				HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(UUID.fromString(uuid),"&c禁止された拡張子のfileが検出されました。")));
 				return;
 			}
 			
@@ -129,6 +129,7 @@ public class ServerFileManager {
 			
 			cache.delete();
 			System.out.println("world upload takes "+(System.currentTimeMillis()-time)+"ms");
+			HostServer.client.send(gson.toJson(new SyncPlayerMessagePacket(UUID.fromString(uuid),"&aWorldがアップロードされました。 所要時間"+(System.currentTimeMillis()-time)+"ms")));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
