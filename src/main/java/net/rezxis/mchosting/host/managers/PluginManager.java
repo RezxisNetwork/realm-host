@@ -21,8 +21,6 @@ public class PluginManager {
 		DBPlugin rezxisMC = plugins.get("RezxisMCHosting");
 		server.sync();
 		File f = new File("servers/"+server.getId()+"/plugins/");
-		File db = new File(f,"database.propertis");
-		File sync = new File(f,"hosting.propertis");
 		ArrayList<DBPlugin> list = new ArrayList<DBPlugin>(plugins.values());
 		list.remove(rezxisMC);
 		for (String s : server.getPlugins()) {
@@ -48,11 +46,6 @@ public class PluginManager {
 			if (plugins.containsKey(p))
 				check(server, plugins.get(p));
 		}
-		if (db.exists())
-			db.delete();
-		if (sync.exists())
-			sync.delete();
-		
 	}
 	
 	private static void check(DBServer server, DBPlugin plugin) throws Exception {
