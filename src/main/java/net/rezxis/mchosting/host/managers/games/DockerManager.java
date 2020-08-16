@@ -182,6 +182,7 @@ public class DockerManager implements IGame {
 				.withExposedPorts(eport)
 				.withEnv(list)
 				.withHostConfig(hostConfig)
+				.withOomKillDisable(true)
 				.exec();
 		} catch (Exception ex) {
 			ex.printStackTrace();
