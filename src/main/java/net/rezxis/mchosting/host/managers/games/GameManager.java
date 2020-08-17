@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.gson.Gson;
 
 import net.rezxis.mchosting.database.Tables;
@@ -77,7 +79,7 @@ public class GameManager {
 			server.update();
 			File logs = new File(new File("servers/"+server.getId()),"logs");
 			if (logs.exists())
-				logs.delete();
+				FileUtils.forceDelete(logs);
 			processes.put(server.getId(), gm.runProcess());
 		} catch (Exception ex) {
 			ex.printStackTrace();
