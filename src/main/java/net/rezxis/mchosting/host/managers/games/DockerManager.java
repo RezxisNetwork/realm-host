@@ -153,17 +153,17 @@ public class DockerManager implements IGame {
 		long cpu = 0;
 		switch (player.getRank()) {
 			case NORMAL:
-				cpu = 100000;
+				cpu = 200000;//100000;
 			case GOLD:
-				cpu = 150000;
+				cpu = 250000;//150000;
 			case DIAMOND:
-				cpu = 200000;
+				cpu = 300000;//200000;
 			case EMERALD:
-				cpu = 250000;
+				cpu = 350000;//250000;
 			case SPECIAL:
-				cpu = 300000;
+				cpu = 350000;//300000;
 			default:
-				cpu = 100000;
+				cpu = 200000;//100000;
 		}
 		HostConfig hostConfig = new HostConfig();
 		hostConfig
