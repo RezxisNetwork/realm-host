@@ -21,7 +21,7 @@ public class HostServer {
 	public static DockerManager dManager;
 	public static CustomDockerManager cManager;
 	public static DockerClient dClient;
-	public static int currentPort = 27000;
+	//public static int currentPort = 27000;#port-test
 	
 	public static void main(String[] args) {
 		props = new Props("host.propertis");

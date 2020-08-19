@@ -71,8 +71,8 @@ public class CustomDockerManager implements IGame {
 		//create container and start - skid from DockerManager
 		Volume vol = new Volume("/data");
 		Bind bind = new Bind(new File("servers/"+target.getId()).getAbsolutePath(),vol);
-		int port = HostServer.currentPort;
-		HostServer.currentPort += 1;
+		int port = 25565;//HostServer.currentPort;#port-test
+		//HostServer.currentPort += 1;#port-test
 		ExposedPort eport = ExposedPort.tcp(25565);
 		Ports bindings = new Ports();
 		bindings.bind(eport, Ports.Binding.bindPort(port));

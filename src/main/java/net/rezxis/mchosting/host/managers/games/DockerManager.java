@@ -112,8 +112,8 @@ public class DockerManager implements IGame {
 					return;
 				}
 			}
-		final int port = HostServer.currentPort;
-		HostServer.currentPort += 1;
+		final int port = 25565;//HostServer.currentPort;#port-test
+		//HostServer.currentPort += 1;#port-test
 		target.setStatus(ServerStatus.STARTING);
 		target.setPort(port);
 		target.update();
@@ -136,9 +136,9 @@ public class DockerManager implements IGame {
 		Volume volServer = new Volume("/data");
 		Bind bindSpigot = new Bind(new File("spigot/").getAbsolutePath(),volSpigot);
 		Bind bindServer = new Bind(new File("servers/"+target.getId()).getAbsolutePath(),volServer);
-		ExposedPort eport = ExposedPort.tcp(port);
-		Ports portBindings = new Ports();
-		portBindings.bind(eport, Ports.Binding.bindPort(port));
+		//ExposedPort eport = ExposedPort.tcp(port);#port-test
+		//Ports portBindings = new Ports();#port-test
+		//portBindings.bind(eport, Ports.Binding.bindPort(port));#port-test
 		ArrayList<String> list = new ArrayList<>();
 		list.add("MAX_MEMORY="+player.getRank().getMem());
 		list.add("sync_address=ws://"+HostServer.props.CHILD_SYNC+":"+HostServer.props.SYNC_PORT);
@@ -167,8 +167,8 @@ public class DockerManager implements IGame {
 		}
 		HostConfig hostConfig = new HostConfig();
 		hostConfig
-				.withBinds(bindSpigot,bindServer)
-				.withPortBindings(portBindings);
+				.withBinds(bindSpigot,bindServer);//#port-test
+				//.withPortBindings(portBindings);#port-test
 		if(HostServer.props.CPULIMIT){
 			hostConfig
 					.withCpuPeriod(Long.valueOf(100000))
@@ -179,7 +179,7 @@ public class DockerManager implements IGame {
 			container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
-				.withExposedPorts(eport)
+				//.withExposedPorts(eport)#port-test
 				.withEnv(list)
 				.withHostConfig(hostConfig)
 				.withAttachStderr(true)
