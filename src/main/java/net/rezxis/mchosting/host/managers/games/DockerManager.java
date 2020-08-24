@@ -176,6 +176,10 @@ public class DockerManager implements IGame {
 		}
 		CreateContainerResponse container = null;
 		try {
+			String tmp = this.getConById(target.getId());
+			if (tmp != null) {
+				client.removeContainerCmd(tmp).withForce(true).exec();
+			}
 			container = client.createContainerCmd(imgName)
 				.withVolumes(volSpigot,volServer)
 				.withName(prefix+target.getId())
