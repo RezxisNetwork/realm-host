@@ -49,6 +49,17 @@ public class PluginManager {
 			if (plugins.containsKey(p))
 				check(server, plugins.get(p));
 		}
+		{
+			File rezxisSQLDir = new File(f, "RezxisSQLPlugin");
+			if (!rezxisSQLDir.exists()) {
+				rezxisSQLDir.mkdirs();
+			}
+			File sqlConf = new File(rezxisSQLDir, "database.yml");
+			if (!sqlConf.exists()) {
+				sqlConf.createNewFile();
+			}
+			FileUtils.copyFile(new File("base/plugins/RezxisSQLPlugin/database.yml"), sqlConf);
+		}
 	}
 	
 	private static void check(DBServer server, DBPlugin plugin) throws Exception {
