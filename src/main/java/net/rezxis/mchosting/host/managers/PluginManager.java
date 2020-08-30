@@ -19,10 +19,12 @@ public class PluginManager {
 	public static void checkPlugins(DBServer server) throws Exception {
 		HashMap<String,DBPlugin> plugins = Tables.getPlTable().getPlugins();
 		DBPlugin rezxisMC = plugins.get("RezxisMCHosting");
+		DBPlugin rezxisSQL = plugins.get("RezxisSQL");
 		server.sync();
 		File f = new File("servers/"+server.getId()+"/plugins/");
 		ArrayList<DBPlugin> list = new ArrayList<DBPlugin>(plugins.values());
 		list.remove(rezxisMC);
+		list.remove(rezxisSQL);
 		for (String s : server.getPlugins()) {
 			DBPlugin p = plugins.get(s);
 			list.remove(p);
@@ -42,6 +44,7 @@ public class PluginManager {
 			}
 		}
 		check(server, rezxisMC);
+		check(server, rezxisSQL);
 		for (String p : server.getPlugins()) {
 			if (plugins.containsKey(p))
 				check(server, plugins.get(p));
