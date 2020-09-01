@@ -3,6 +3,7 @@ package net.rezxis.mchosting.host;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
+import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ServerHandshake;
 
 import com.google.gson.Gson;

@@ -8,6 +8,8 @@ import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.host.managers.ServerFileManager;
+import net.rezxis.mchosting.host.managers.anni.AnniManager;
+//import net.rezxis.mchosting.host.managers.anni.AnniManager;
 import net.rezxis.mchosting.host.managers.games.CustomDockerManager;
 import net.rezxis.mchosting.host.managers.games.DockerManager;
 import net.rezxis.mchosting.network.packet.Packet;
@@ -45,7 +47,12 @@ public class WorkerThread extends Thread {
 			return;
 		}
 		System.out.println("Received : "+message);
-		if (type == PacketType.CreateServer) {
+		if (type == PacketType.AnniStart) {
+			HostAnniStart pp = gson.fromJson(message, HostAnniStart.class);
+			AnniManager.start(pp.getPort());
+		} else if (type == PacketType.AnniServerStatusSigns) {
+			//AnniManager.packetAnniServerStatusSigns(message);
+		} else if (type == PacketType.CreateServer) {
 			ServerFileManager.createServer(message);
 			//GameManager.createServer(message);
 		} else if (type == PacketType.StartServer) {
