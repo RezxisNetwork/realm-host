@@ -104,7 +104,7 @@ public class DockerManager implements IGame {
 	
 	public void start(DBServer target) {
 		DBPlayer player = Tables.getPTable().get(target.getOwner());
-		if (player.getRank() != Rank.OWNER || player.getRank() != Rank.SPECIAL || player.getRank() != Rank.DEVELOPER )
+		if (!(player.getRank() == Rank.OWNER || player.getRank() == Rank.SPECIAL || player.getRank() == Rank.DEVELOPER) )
 			if (runningServers() > HostServer.props.MAX_SERVERS) {
 				if (!player.isSupporter()) {
 					System.out.println("There are no space to start target");
