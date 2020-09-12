@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class AnniMCProperties {
     final Properties properties = new Properties();
-    public AnniMCProperties(String name,int port) {
+    public AnniMCProperties(String name, String ip, int port) {
     	properties.setProperty("spawn-protection", ""+0);
     	properties.setProperty("max-tick-time", ""+60000);
     	properties.setProperty("query.port", ""+25567);
@@ -35,7 +35,7 @@ public class AnniMCProperties {
     	properties.setProperty("max-world-size", "29999");
     	properties.setProperty("server-port", ""+port);
     	properties.setProperty("debug", "false");
-    	properties.setProperty("server-ip", "");
+    	properties.setProperty("server-ip", ip);
     	properties.setProperty("spawn-npcs", "true");
     	properties.setProperty("allow-flight", "true");
     	properties.setProperty("level-name", "lobby");
