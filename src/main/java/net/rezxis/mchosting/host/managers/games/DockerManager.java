@@ -46,7 +46,16 @@ public class DockerManager implements IGame {
 	public DockerClient client;
 	
 	public int runningServers() {
-		return client.infoCmd().exec().getContainersRunning();
+		int count = 0;
+		for (Container c : client.listContainersCmd().exec()) {
+			for (String s : c.getNames()) {
+				if (s.startsWith("/container")) {
+					++count;
+				}
+			}
+		}
+		return count;
+		//return client.infoCmd().exec().getContainersRunning();
 	}
 	
 	public void reboot(DBServer target) {
