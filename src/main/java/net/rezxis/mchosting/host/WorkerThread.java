@@ -19,7 +19,7 @@ import net.rezxis.mchosting.network.packet.all.ExecuteScriptPacket;
 import net.rezxis.mchosting.network.packet.host.*;
 import net.rezxis.utils.scripts.ScriptEngineLauncher;
 
-public class WorkerThread extends Thread {
+public class WorkerThread implements Runnable {
 
 	private static Gson gson = new Gson();
 	public static DockerManager dMgr;

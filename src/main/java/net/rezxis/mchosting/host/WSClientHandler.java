@@ -2,8 +2,9 @@ package net.rezxis.mchosting.host;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ServerHandshake;
 
 import com.google.gson.Gson;
@@ -15,10 +16,11 @@ import net.rezxis.mchosting.network.packet.sync.SyncAuthSocketPacket;
 public class WSClientHandler implements ClientHandler {
 
 	public static Gson gson = new Gson();
+	public static ExecutorService pool = null;
 	
 	@Override
 	public void onMessage(String message) {
-		new WorkerThread(message).start();
+		pool.submit(new WorkerThread(message));
 	}
 
 	@Override
@@ -37,6 +39,7 @@ public class WSClientHandler implements ClientHandler {
 
 	@Override
 	public void onOpen(ServerHandshake handshakedata) {
+		pool = Executors.newFixedThreadPool(5);
 		HashMap<String,String> values = new HashMap<>();
 		values.put("id", String.valueOf(HostServer.props.HOST_ID));
 		SyncAuthSocketPacket packet = new SyncAuthSocketPacket(ServerType.HOST, values);
