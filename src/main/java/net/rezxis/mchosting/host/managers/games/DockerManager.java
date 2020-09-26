@@ -98,6 +98,8 @@ public class DockerManager implements IGame {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		target.setStatus(ServerStatus.STOP);
+		target.update();
 	}
 	
 	public void kill(DBServer target) {
