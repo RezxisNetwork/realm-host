@@ -55,7 +55,6 @@ public class DockerManager implements IGame {
 			}
 		}
 		return count;
-		//return client.infoCmd().exec().getContainersRunning();
 	}
 	
 	public void reboot(DBServer target) {
@@ -66,6 +65,8 @@ public class DockerManager implements IGame {
 			if (time >= 10) {
 				WebAPI.webhook(DiscordWebHookEnum.PRIVATE, String.format("[WARNING] A container restarting will not stop. ServerID : %s , Owner : %s , ContainerID : %s", String.valueOf(target.getId()),
 						target.getOwner().toString(),id));
+				client.stopContainerCmd(id).exec();
+				time = 0;
 			}
 			running = client.inspectContainerCmd(id).exec().getState().getRunning();
 			try {
@@ -88,6 +89,8 @@ public class DockerManager implements IGame {
 			return;
 		}
 		client.startContainerCmd(id).exec();
+		target.setIp(client.inspectContainerCmd(id).exec().getNetworkSettings().getIpAddress());
+		target.update();
 	}
 	
 	public void stopped(DBServer target) {
