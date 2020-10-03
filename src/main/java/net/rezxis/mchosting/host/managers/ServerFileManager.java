@@ -202,7 +202,7 @@ public class ServerFileManager {
 			} else if (packet.action == BackupAction.DELETE) {
 				DBBackup obj = Tables.getBTable().getBackupFromID(Integer.valueOf(packet.value.get("id")));
 				try {
-					FileUtils.forceDelete(new File("backups/"+server.getId()));
+					FileUtils.forceDelete(new File("backups/"+server.getId()+".zip"));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
