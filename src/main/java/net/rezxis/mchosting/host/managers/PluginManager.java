@@ -2,8 +2,7 @@ package net.rezxis.mchosting.host.managers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -11,74 +10,61 @@ import org.apache.commons.io.FileUtils;
 import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.server.DBPlugin;
 import net.rezxis.mchosting.database.object.server.DBServer;
+import net.rezxis.mchosting.database.object.server.DBServerPluginLink;
 
 public class PluginManager {
 
 	public static final File pluginFolder = new File("plugins");
+	public static String[] forced = new String[] {"RezxisMCHosting","RezxisSQL"};
 	
 	public static void checkPlugins(DBServer server) throws Exception {
-		HashMap<String,DBPlugin> plugins = Tables.getPlTable().getPlugins();
-		DBPlugin rezxisMC = plugins.get("RezxisMCHosting");
-		DBPlugin rezxisSQL = plugins.get("RezxisSQL");
-		server.sync();
-		File f = new File("servers/"+server.getId()+"/plugins/");
-		ArrayList<DBPlugin> list = new ArrayList<DBPlugin>(plugins.values());
-		list.remove(rezxisMC);
-		list.remove(rezxisSQL);
-		for (String s : server.getPlugins()) {
-			DBPlugin p = plugins.get(s);
-			list.remove(p);
-		}
-		for (File file : f.listFiles()) {
-			for (DBPlugin p : list) {
-				if (file.getName().endsWith(".jar")) {
-					if (file.getName().equalsIgnoreCase(p.getJarName())) {
-						if (file.exists())
-							FileUtils.forceDelete(file);
-					}
-					if (file.getName().equalsIgnoreCase(p.getName())) {
-						if (file.exists())
-							FileUtils.forceDelete(file);
-					}
+		File source = new File("plugins/");
+		File plugins = new File("servers/"+server.getId()+"/plugins/");
+		for (DBServerPluginLink link : Tables.getSplTable().getAllByServer(server.getId())) {
+			DBPlugin plugin = link.getDBPlugin();
+			for (String s : forced)
+				if (plugin.getName().equalsIgnoreCase(s)) {
+					link.setEnabled(true);
+					link.setLastEnabled(true);
+				}
+			if (link.isEnabled()) {
+				if (!link.isLastEnabled()) {
+					FileUtils.copyFile(new File(source, plugin.getJarName()), new File(plugins, plugin.getJarName()));
+				} else {
+					checkPlugin(source, plugins, plugin, server);
+				}
+			} else {
+				if (link.isLastEnabled()) {
+					FileUtils.forceDelete(new File(plugins, plugin.getJarName()));
 				}
 			}
+			link.setLastEnabled(link.isEnabled());
+			link.update();
 		}
-		check(server, rezxisMC);
-		check(server, rezxisSQL);
-		for (String p : server.getPlugins()) {
-			if (plugins.containsKey(p))
-				check(server, plugins.get(p));
+		initDB(plugins);
+	}
+	
+	private static void checkPlugin(File s, File p, DBPlugin plugin, DBServer server) throws IOException {
+		File source = new File(s, plugin.getJarName());
+		File dest = new File(s, plugin.getJarName());
+		if (!dest.exists()) {
+			FileUtils.copyFile(source, dest);
+			return;
 		}
-		{
-			File rezxisSQLDir = new File(f, "RezxisSQLPlugin");
-			if (!rezxisSQLDir.exists()) {
-				rezxisSQLDir.mkdirs();
-			}
-			File sqlConf = new File(rezxisSQLDir, "database.yml");
-			if (!sqlConf.exists()) {
-				sqlConf.createNewFile();
-			}
-			FileUtils.copyFile(new File("base/plugins/RezxisSQLPlugin/database.yml"), sqlConf);
+		if (!DigestUtils.md5Hex(new FileInputStream(source)).equals(DigestUtils.md5Hex(new FileInputStream(dest)))) {
+			FileUtils.copyFile(source, dest);
 		}
 	}
 	
-	private static void check(DBServer server, DBPlugin plugin) throws Exception {
-		File plugins = new File("servers/"+server.getId()+"/plugins/");//server plugins folder
-		File pFile = new File(plugins,plugin.getJarName());//dest plugin
-		File sFile = new File(pluginFolder, plugin.getJarName());//source plugin
-		if (!pFile.exists()) {//not copied plugin
-			FileUtils.copyFile(sFile, pFile);
-			return;
+	private static void initDB(File plugins) throws IOException {
+		File rezxisSQLDir = new File(plugins, "RezxisSQLPlugin");
+		if (!rezxisSQLDir.exists()) {
+			rezxisSQLDir.mkdirs();
 		}
-		FileInputStream fis = new FileInputStream(sFile);
-		String srcHash = DigestUtils.md5Hex(fis);
-		fis.close();
-		fis = new FileInputStream(pFile);
-		String destHash = DigestUtils.md5Hex(fis);
-		fis.close();
-		if (!srcHash.equals(destHash)) {//not match hash (updated or cracked)
-			pFile.delete();
-			FileUtils.copyFile(sFile, pFile);
+		File sqlConf = new File(rezxisSQLDir, "database.yml");
+		if (!sqlConf.exists()) {
+			sqlConf.createNewFile();
 		}
+		FileUtils.copyFile(new File("base/plugins/RezxisSQLPlugin/database.yml"), sqlConf);
 	}
 }
