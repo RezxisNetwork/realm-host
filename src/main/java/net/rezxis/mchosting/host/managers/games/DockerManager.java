@@ -57,6 +57,7 @@ public class DockerManager implements IGame {
 		return count;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void reboot(DBServer target) {
 		String id = getConById(target.getId());
 		boolean running = true;
@@ -116,6 +117,7 @@ public class DockerManager implements IGame {
 		WebAPI.webhook(DiscordWebHookEnum.PRIVATE, String.format("killed a server ID : %s , UUID : %s", target.getId(), target.getOwner().toString()));
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void start(DBServer target) {
 		DBPlayer player = Tables.getPTable().get(target.getOwner());
 		if (!(player.getRank() == Rank.OWNER || player.getRank() == Rank.SPECIAL || player.getRank() == Rank.DEVELOPER) )

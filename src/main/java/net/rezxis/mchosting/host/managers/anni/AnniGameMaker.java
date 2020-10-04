@@ -5,22 +5,24 @@ import java.util.ArrayList;
 
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Volume;
 
 import net.rezxis.mchosting.host.HostServer;
 
 public class AnniGameMaker {
 
+	@SuppressWarnings("unused")
 	private String serverName;
 	private String bukkitSettings = "bukkit.yml";
 	private String commandsSettings = "commands.yml";
 	private String config = "server.properties";
+	@SuppressWarnings("unused")
 	private boolean eulaArgee = true;
 	private String host = ""; //empty is default
 	private int maxPlayers = 120;
 	private String plugins = "plugins";
 	private int port = 25565;
+	@SuppressWarnings("unused")
 	private String spigotSettings = "spigot.yml";
 	private File spigotJar;
 	private File defDir;
@@ -37,6 +39,7 @@ public class AnniGameMaker {
 		this.sid = id;
 	}
 
+	@SuppressWarnings("deprecation")
 	public String build() {
 		ArrayList<String> args = new ArrayList<String>();
 		{
