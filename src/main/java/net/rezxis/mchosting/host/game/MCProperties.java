@@ -54,7 +54,7 @@ public class MCProperties {
     	properties.setProperty("spawn-monsters", "true");
     	properties.setProperty("generate-structures", "true");
     	properties.setProperty("view-distance", "10");
-    	properties.setProperty("motd",server.getDisplayName());
+    	properties.setProperty("motd",server.getMotd());
     	properties.setProperty("spawn-protection", ""+0);
     	properties.setProperty("server-name", server.getDisplayName());
     }
