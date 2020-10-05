@@ -28,11 +28,7 @@ public class PluginManager {
 					link.setLastEnabled(true);
 				}
 			if (link.isEnabled()) {
-				if (!link.isLastEnabled()) {
-					FileUtils.copyFile(new File(source, plugin.getJarName()), new File(plugins, plugin.getJarName()));
-				} else {
-					checkPlugin(source, plugins, plugin, server);
-				}
+				FileUtils.copyFile(new File(source, plugin.getJarName()), new File(plugins, plugin.getJarName()));
 			} else {
 				if (link.isLastEnabled()) {
 					FileUtils.forceDelete(new File(plugins, plugin.getJarName()));
@@ -43,7 +39,7 @@ public class PluginManager {
 		}
 		initDB(plugins);
 	}
-	
+	/*
 	private static void checkPlugin(File s, File p, DBPlugin plugin, DBServer server) throws IOException {
 		File source = new File(s, plugin.getJarName());
 		File dest = new File(s, plugin.getJarName());
@@ -54,7 +50,7 @@ public class PluginManager {
 		if (!DigestUtils.md5Hex(new FileInputStream(source)).equals(DigestUtils.md5Hex(new FileInputStream(dest)))) {
 			FileUtils.copyFile(source, dest);
 		}
-	}
+	}*/
 	
 	private static void initDB(File plugins) throws IOException {
 		File rezxisSQLDir = new File(plugins, "RezxisSQLPlugin");
