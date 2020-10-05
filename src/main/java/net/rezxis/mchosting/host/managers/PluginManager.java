@@ -1,10 +1,8 @@
 package net.rezxis.mchosting.host.managers;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
 import net.rezxis.mchosting.database.Tables;
@@ -23,7 +21,6 @@ public class PluginManager {
 		for (DBServerPluginLink link : Tables.getSplTable().getAllByServer(server.getId())) {
 			DBPlugin plugin = link.getDBPlugin();
 			if (link.isEnabled()) {
-				System.out.println(server.getId()+":"+plugin.getName());
 				FileUtils.copyFile(new File(source, plugin.getJarName()), new File(plugins, plugin.getJarName()));
 			} else {
 				if (link.isLastEnabled()) {
