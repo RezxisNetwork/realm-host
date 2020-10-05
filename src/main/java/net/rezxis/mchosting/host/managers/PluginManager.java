@@ -28,6 +28,7 @@ public class PluginManager {
 					link.setLastEnabled(true);
 				}
 			if (link.isEnabled()) {
+				System.out.println(server.getId()+":"+plugin.getName());
 				FileUtils.copyFile(new File(source, plugin.getJarName()), new File(plugins, plugin.getJarName()));
 			} else {
 				if (link.isLastEnabled()) {
