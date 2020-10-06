@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -16,8 +17,11 @@ import com.google.gson.Gson;
 import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.internal.DBBackup;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
+import net.rezxis.mchosting.database.object.server.DBBackupPluginLink;
+import net.rezxis.mchosting.database.object.server.DBPlugin;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.DBServer.GameType;
+import net.rezxis.mchosting.database.object.server.DBServerPluginLink;
 import net.rezxis.mchosting.database.object.server.DBShop;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
 import net.rezxis.mchosting.database.object.server.ShopItem;
@@ -44,7 +48,7 @@ public class ServerFileManager {
 			return;
 		}
 		DBServer server = new DBServer(-1, createPacket.displayName,
-				UUID.fromString(createPacket.player), -1, "", new ArrayList<>(),
+				UUID.fromString(createPacket.player), -1, "", 
 				-1,ServerStatus.STOP,createPacket.world, HostServer.props.HOST_ID,
 				"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()),0,GameType.valueOf(createPacket.stype), "", "", "");
 		DBPlayer player = Tables.getPTable().get(UUID.fromString(createPacket.player));
@@ -54,10 +58,8 @@ public class ServerFileManager {
 			HostServer.client.send(gson.toJson(packet));
 			return;
 		}
-		
-		ArrayList<String> array = new ArrayList<>();
-		array.add("ViaVersion");
-		server.setPlugins(array);
+		DBServerPluginLink link = new DBServerPluginLink(-1,server.getId(), "ViaVersion", Tables.getPlTable().get("ViaVersion").get(0).getId(),true,false);
+		Tables.getSplTable().insert(link);
 		server.update();
 		new Thread(()->{
 			ServerFileUtil.generateServerFile(server,player);
@@ -182,8 +184,15 @@ public class ServerFileManager {
 				for (ShopItem item : server.getShop().getItems()) {
 					item.setEarned(0);
 				}
-				DBBackup obj = new DBBackup(-1, packet.owner, packet.value.get("name"), new Date(), server.getPlugins(), gson.toJson(server.getShop()));
+				DBBackup obj = new DBBackup(-1, packet.owner, packet.value.get("name"), new Date(), gson.toJson(server.getShop()));
 				Tables.getBTable().insert(obj);
+				for (DBServerPluginLink pLink : Tables.getSplTable().getAllByServer(server.getId())) {
+					if (pLink.isEnabled()) {
+						DBBackupPluginLink bLink = new DBBackupPluginLink(-1, obj.getId(), pLink.getDBPlugin().getId());
+						Tables.getBplTable().insert(bLink);
+					}
+				}
+				
 				File dest = new File("backups/"+obj.getId()+".zip");
 				try {
 					ZipUtil.pack(new File("servers/"+server.getId()), dest);
@@ -201,6 +210,9 @@ public class ServerFileManager {
 				server.update();
 			} else if (packet.action == BackupAction.DELETE) {
 				DBBackup obj = Tables.getBTable().getBackupFromID(Integer.valueOf(packet.value.get("id")));
+				for (DBBackupPluginLink link : Tables.getBplTable().getAllByBackup(obj.getId())) {
+					Tables.getBplTable().delete(link);
+				}
 				try {
 					FileUtils.forceDelete(new File("backups/"+server.getId()+".zip"));
 				} catch (IOException e) {
@@ -216,7 +228,22 @@ public class ServerFileManager {
 			} else if (packet.action == BackupAction.PATCH) {
 				DBBackup obj = Tables.getBTable().getBackupFromID(Integer.valueOf(packet.value.get("id")));
 				server.setStatus(ServerStatus.BACKUP);
-				server.setPlugins(obj.getPlugins());
+				ArrayList<DBBackupPluginLink> blinks = Tables.getBplTable().getAllByBackup(obj.getId());
+				ArrayList<DBServerPluginLink> slinks = Tables.getSplTable().getAllByServer(server.getId());
+				slinks.forEach((slink) -> {slink.setEnabled(false);slink.update();});
+				for (DBBackupPluginLink blink : blinks) {
+					DBPlugin plugin = Tables.getPlTable().getPluginById(blink.getPlugin());
+					DBServerPluginLink slink = Tables.getSplTable().getLink(server.getId(), plugin.getName());
+					if (slink != null) {
+						slink.setEnabled(true);
+						slink.setPlugin(plugin.getId());
+						slink.update();
+					} else {
+						slink = new DBServerPluginLink(-1, server.getId(), plugin.getName(), plugin.getId(), true, false);
+						Tables.getSplTable().insert(slink);
+					}
+				}
+				
 				server.setShop(gson.fromJson(obj.getShop(), DBShop.class));
 				server.update();
 				File sFile = new File("servers/"+server.getId());
