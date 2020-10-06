@@ -24,7 +24,8 @@ public class PluginManager {
 				FileUtils.copyFile(new File(source, plugin.getJarName()), new File(plugins, plugin.getJarName()));
 			} else {
 				if (link.isLastEnabled()) {
-					FileUtils.forceDelete(new File(plugins, plugin.getJarName()));
+					if (new File(plugins, plugin.getJarName()).exists())
+						FileUtils.forceDelete(new File(plugins, plugin.getJarName()));
 				}
 			}
 			link.setLastEnabled(link.isEnabled());
