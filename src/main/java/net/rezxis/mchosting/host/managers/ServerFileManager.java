@@ -18,13 +18,15 @@ import net.rezxis.mchosting.database.Tables;
 import net.rezxis.mchosting.database.object.internal.DBBackup;
 import net.rezxis.mchosting.database.object.player.DBPlayer;
 import net.rezxis.mchosting.database.object.server.DBBackupPluginLink;
+import net.rezxis.mchosting.database.object.server.DBBackupShopItemLink;
 import net.rezxis.mchosting.database.object.server.DBPlugin;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.database.object.server.DBServerPluginLink;
 import net.rezxis.mchosting.database.object.server.DBShop;
+import net.rezxis.mchosting.database.object.server.DBShopItem;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
-import net.rezxis.mchosting.database.object.server.ShopItem;
+import net.rezxis.mchosting.database.object.server.DBShopItembase;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.game.ServerFileUtil;
 import net.rezxis.mchosting.network.packet.enums.BackupAction;
@@ -181,10 +183,7 @@ public class ServerFileManager {
 				}
 				server.setStatus(ServerStatus.BACKUP);
 				server.update();
-				for (ShopItem item : server.getShop().getItems()) {
-					item.setEarned(0);
-				}
-				DBBackup obj = new DBBackup(-1, packet.owner, packet.value.get("name"), new Date(), gson.toJson(server.getShop()));
+				DBBackup obj = new DBBackup(-1, packet.owner, packet.value.get("name"), new Date());
 				Tables.getBTable().insert(obj);
 				for (DBServerPluginLink pLink : Tables.getSplTable().getAllByServer(server.getId())) {
 					if (pLink.isEnabled()) {
@@ -192,7 +191,9 @@ public class ServerFileManager {
 						Tables.getBplTable().insert(bLink);
 					}
 				}
-				
+				for (DBShopItem item : Tables.getSiTable().getShopItems(server.getId())) {
+					new DBBackupShopItemLink(-1, obj.getId(), item.getName(), item.getItemType(), item.getCmd(), item.getPrice(), item.getEarned()).insert();
+				}
 				File dest = new File("backups/"+obj.getId()+".zip");
 				try {
 					ZipUtil.pack(new File("servers/"+server.getId()), dest);
@@ -244,7 +245,12 @@ public class ServerFileManager {
 					}
 				}
 				
-				server.setShop(gson.fromJson(obj.getShop(), DBShop.class));
+				for (DBShopItem item : Tables.getSiTable().getShopItems(server.getId())) {
+					item.delete();
+				}
+				for (DBBackupShopItemLink link : Tables.getBsiTable().getShopItems(obj.getId())) {
+					new DBShopItem(-1, server.getId(), link.getName(), link.getItemType(), link.getCmd(), link.getPrice(), link.getEarned()).insert();
+				}
 				server.update();
 				File sFile = new File("servers/"+server.getId());
 				sFile.delete();
