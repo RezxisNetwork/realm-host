@@ -191,7 +191,7 @@ public class ServerFileManager {
 					}
 				}
 				for (DBShopItem item : Tables.getSiTable().getShopItems(server.getId())) {
-					new DBBackupShopItemLink(-1, obj.getId(), item.getName(), item.getItemType(), item.getCmd(), item.getPrice(), item.getEarned()).insert();
+					new DBBackupShopItemLink(-1, obj.getId(), item.getName(), item.getItemType(), item.getCmd(), item.getPrice(), 0).insert();
 				}
 				File dest = new File("backups/"+obj.getId()+".zip");
 				try {
@@ -248,7 +248,7 @@ public class ServerFileManager {
 					item.delete();
 				}
 				for (DBBackupShopItemLink link : Tables.getBsiTable().getShopItems(obj.getId())) {
-					new DBShopItem(-1, server.getId(), link.getName(), link.getItemType(), link.getCmd(), link.getPrice(), link.getEarned()).insert();
+					new DBShopItem(-1, server.getId(), link.getName(), link.getItemType(), link.getCmd(), link.getPrice(), 0).insert();
 				}
 				server.update();
 				File sFile = new File("servers/"+server.getId());
