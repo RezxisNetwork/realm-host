@@ -246,10 +246,12 @@ public class ServerFileManager {
 						Tables.getSplTable().insert(slink);
 					}
 				}
-				
+				DBPlayer player = Tables.getPTable().get(server.getOwner());
 				for (DBShopItem item : Tables.getSiTable().getShopItems(server.getId())) {
+					player.addCoin(item.getEarned());
 					item.delete();
 				}
+				player.update();
 				for (DBBackupShopItemLink link : Tables.getBsiTable().getShopItems(obj.getId())) {
 					new DBShopItem(-1, server.getId(), link.getName(), link.getItemType(), link.getCmd(), link.getPrice(), 0).insert();
 				}
