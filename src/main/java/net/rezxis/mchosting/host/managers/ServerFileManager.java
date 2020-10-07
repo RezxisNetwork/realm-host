@@ -23,10 +23,8 @@ import net.rezxis.mchosting.database.object.server.DBPlugin;
 import net.rezxis.mchosting.database.object.server.DBServer;
 import net.rezxis.mchosting.database.object.server.DBServer.GameType;
 import net.rezxis.mchosting.database.object.server.DBServerPluginLink;
-import net.rezxis.mchosting.database.object.server.DBShop;
 import net.rezxis.mchosting.database.object.server.DBShopItem;
 import net.rezxis.mchosting.database.object.server.ServerStatus;
-import net.rezxis.mchosting.database.object.server.DBShopItembase;
 import net.rezxis.mchosting.host.HostServer;
 import net.rezxis.mchosting.host.game.ServerFileUtil;
 import net.rezxis.mchosting.network.packet.enums.BackupAction;
@@ -52,7 +50,8 @@ public class ServerFileManager {
 		DBServer server = new DBServer(-1, createPacket.displayName,
 				UUID.fromString(createPacket.player), -1, "", 
 				-1,ServerStatus.STOP,createPacket.world, HostServer.props.HOST_ID,
-				"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()),0,GameType.valueOf(createPacket.stype), "", "", "");
+				//"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()),0,GameType.valueOf(createPacket.stype), "", "", "");
+				"",true,true,"EMERALD_BLOCK",0,GameType.valueOf(createPacket.stype), "", "", "");
 		DBPlayer player = Tables.getPTable().get(UUID.fromString(createPacket.player));
 		Tables.getSTable().insert(server);
 		if (server.getType() == GameType.CUSTOM) {
