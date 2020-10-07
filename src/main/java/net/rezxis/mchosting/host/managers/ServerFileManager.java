@@ -213,6 +213,9 @@ public class ServerFileManager {
 				for (DBBackupPluginLink link : Tables.getBplTable().getAllByBackup(obj.getId())) {
 					Tables.getBplTable().delete(link);
 				}
+				for (DBBackupShopItemLink link : Tables.getBsiTable().getShopItems(obj.getId())) {
+					link.delete();
+				}
 				try {
 					FileUtils.forceDelete(new File("backups/"+server.getId()+".zip"));
 				} catch (IOException e) {
