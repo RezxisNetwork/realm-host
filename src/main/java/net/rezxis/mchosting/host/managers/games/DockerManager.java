@@ -165,6 +165,7 @@ public class DockerManager implements IGame {
 		list.add("db_name="+HostServer.props.DB_NAME);
 		list.add("TZ=Asia/Tokyo");
 		list.add("sowner="+target.getOwner().toString());
+		list.add("MC_VERSION="+target.getVersion().name());
 		//long mem = Integer.valueOf(player.getRank().getMem().replace("G", "")) * 1024;
 		long cpu = 0;
 		switch (player.getRank()) {
