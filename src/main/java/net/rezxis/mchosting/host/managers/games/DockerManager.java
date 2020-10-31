@@ -223,7 +223,7 @@ public class DockerManager implements IGame {
 			return;
 		}
 		try {
-			client.connectToNetworkCmd().withContainerId(container.getId()).withNetworkId("02d3a37e13da8087f00dbdd7d4587fbec4471421557d06149c51b3c0845c4d5f").exec();
+			client.connectToNetworkCmd().withContainerId(container.getId()).withNetworkId("9e55219097c90c62d827ec369dc7b98d80d5057daf7243b9cd8204521f2e14a2").exec();
 			client.startContainerCmd(container.getId()).exec();
 			target.setIp(client.inspectContainerCmd(container.getId()).exec().getNetworkSettings().getIpAddress());
 			target.update();
