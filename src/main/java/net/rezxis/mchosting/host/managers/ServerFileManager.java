@@ -52,7 +52,7 @@ public class ServerFileManager {
 				UUID.fromString(createPacket.player), -1, "", 
 				-1,ServerStatus.STOP,createPacket.world, HostServer.props.HOST_ID,
 				//"",true,true,"EMERALD_BLOCK", new DBShop(new ArrayList<>()),0,GameType.valueOf(createPacket.stype), "", "", "");
-				"",true,true,"EMERALD_BLOCK",0,GameType.valueOf(createPacket.stype), "", "", "",Version.M1_12_2);
+				"",true,true,"EMERALD_BLOCK",0,GameType.valueOf(createPacket.stype), "", "", "",Version.valueOf(createPacket.version));
 		DBPlayer player = Tables.getPTable().get(UUID.fromString(createPacket.player));
 		Tables.getSTable().insert(server);
 		if (server.getType() == GameType.CUSTOM) {
