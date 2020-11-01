@@ -21,7 +21,7 @@ public class PluginManager {
 		for (DBServerPluginLink link : Tables.getSplTable().getAllByServer(server.getId())) {
 			DBPlugin plugin = link.getDBPlugin();
 			if (link.isEnabled()) {
-				FileUtils.copyFile(new File(source, plugin.getJarName()), new File(plugins, plugin.getJarName()));
+				FileUtils.copyFile(new File(source, plugin.getName()+"/"+plugin.getJarName()), new File(plugins, plugin.getJarName()));
 			} else {
 				if (link.isLastEnabled()) {
 					if (new File(plugins, plugin.getJarName()).exists())
@@ -33,8 +33,8 @@ public class PluginManager {
 		}
 		DBPlugin gamePlugin = Tables.getPlTable().get("RezxisMCHosting").get(0);
 		DBPlugin rezxisSql = Tables.getPlTable().get("RezxisSQL").get(0);
-		FileUtils.copyFile(new File(source, gamePlugin.getJarName()), new File(plugins, gamePlugin.getJarName()));
-		FileUtils.copyFile(new File(source, rezxisSql.getJarName()), new File(plugins, rezxisSql.getJarName()));
+		FileUtils.copyFile(new File(source, gamePlugin.getJarName()), new File(plugins, gamePlugin.getName()+"/"+gamePlugin.getJarName()));
+		FileUtils.copyFile(new File(source, rezxisSql.getJarName()), new File(plugins,rezxisSql.getName()+"/"+rezxisSql.getJarName()));
 		initDB(plugins);
 	}
 	/*
