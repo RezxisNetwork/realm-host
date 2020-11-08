@@ -191,6 +191,7 @@ public class DockerManager implements IGame {
 					.withCpuPeriod(Long.valueOf(100000))
 					.withCpuQuota(cpu);
 		}
+		hostConfig.withAutoRemove(true);
 		CreateContainerResponse container = null;
 		try {
 			String tmp = this.getConById(target.getId());

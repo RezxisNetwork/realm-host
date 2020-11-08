@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Volume;
 
 import net.rezxis.mchosting.host.HostServer;
@@ -80,7 +81,9 @@ public class AnniGameMaker {
 			Bind bindData = new Bind(this.defDir.getAbsolutePath(),volData);
 			/*ExposedPort eport = ExposedPort.tcp(port);
 			Ports portBindings = new Ports();
-			portBindings.bind(eport, Ports.Binding.bindPort(port));*/	
+			portBindings.bind(eport, Ports.Binding.bindPort(port));*/
+			HostConfig config = new HostConfig();
+			config.withAutoRemove(true);
 			String id = HostServer.dClient.createContainerCmd("openjdk:8-jre")
 					.withCmd(args)
 					.withWorkingDir(this.defDir.getAbsolutePath())
@@ -95,6 +98,7 @@ public class AnniGameMaker {
 					.withAttachStdout(true)
 					.withStdInOnce(true)
 					.withStdinOpen(true)
+					.withHostConfig(config)
 					.exec().getId();
 			cid = id;
 			return id;
