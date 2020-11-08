@@ -70,7 +70,7 @@ public class AnniGameMaker {
 		try {
 			for (Container con : HostServer.dClient.listContainersCmd().exec()) {
 				for (String name : con.getNames()) {
-					if (name.equalsIgnoreCase("rezxis_ANNI_"+port)) {
+					if (name.contains("rezxis_ANNI_"+port)) {
 						HostServer.dClient.startContainerCmd(con.getId()).exec();
 						return con.getId();
 					}
