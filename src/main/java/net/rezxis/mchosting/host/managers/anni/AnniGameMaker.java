@@ -85,6 +85,7 @@ public class AnniGameMaker {
 			HostConfig config = new HostConfig();
 			config.withAutoRemove(true);
 			String id = HostServer.dClient.createContainerCmd("openjdk:8-jre")
+					.withHostConfig(config)
 					.withCmd(args)
 					.withWorkingDir(this.defDir.getAbsolutePath())
 					.withBinds(bindData)
@@ -98,7 +99,6 @@ public class AnniGameMaker {
 					.withAttachStdout(true)
 					.withStdInOnce(true)
 					.withStdinOpen(true)
-					.withHostConfig(config)
 					.exec().getId();
 			cid = id;
 			return id;
