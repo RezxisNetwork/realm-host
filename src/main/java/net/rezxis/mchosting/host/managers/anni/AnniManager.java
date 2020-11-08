@@ -18,7 +18,7 @@ public class AnniManager {
 	
 	public static void start(int port) {
 		String serverName = "ANNI_"+port;
-		File gameDir=generateServerFile(serverName, port, "172.121.0."+(1+port));
+		File gameDir=generateServerFile(serverName, port, "172.18.0."+(1+port));
 		initPlugins(new File(gameDir,"plugins"));
 		AnniGameMaker gameMaker = new AnniGameMaker(serverName, new File(gameDir,"spigot.jar"), gameDir, port);
 		gameMaker.setPort(port);

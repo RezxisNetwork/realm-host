@@ -90,7 +90,7 @@ public class AnniGameMaker {
 					.withNetworkMode("anni")
 					.withTty(true)
 					.withAttachStderr(true)
-					.withIpv4Address("172.21.0."+(1+this.sid))
+					.withIpv4Address("172.18.0."+(1+this.sid))
 					.withAttachStdin(true)
 					.withAttachStdout(true)
 					.withStdInOnce(true)
