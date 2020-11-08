@@ -13,7 +13,7 @@ import okhttp3.Response;
 public class AnniManager {
 
 	private static final File anniRoot = new File("/servers/rezxis/anni/");
-	private static final AnniPlugin[] plugins = new AnniPlugin[] {AnniPlugin.ANNIHILATION,AnniPlugin.ANTILOGGER,AnniPlugin.BONUSMANAGER,AnniPlugin.CHATMANAGER,AnniPlugin.CORE,AnniPlugin.GAMEDEPLOYSPIGOT,AnniPlugin.MINEZSTATUS,
+	private static final AnniPlugin[] plugins = new AnniPlugin[] {AnniPlugin.ANNIHILATION,AnniPlugin.ANTILOGGER,AnniPlugin.BONUSMANAGER,AnniPlugin.CHATMANAGER,AnniPlugin.CORE,AnniPlugin.MINEZSTATUS,
 			AnniPlugin.PARTIES,AnniPlugin.PREFERENCES,AnniPlugin.RANKS,AnniPlugin.SERVERSTATUSSIGN,AnniPlugin.XP,AnniPlugin.SOULBOUND,AnniPlugin.REZXISSQLPLUGIN};
 	
 	public static void start(int port) {

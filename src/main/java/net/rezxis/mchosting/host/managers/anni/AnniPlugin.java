@@ -9,7 +9,6 @@ public enum AnniPlugin {
 	BONUSMANAGER("https://ci.rezxis.net/job/bonusmanager/lastSuccessfulBuild/artifact/target/bonusmanager-0.0.1-SNAPSHOT.jar"),
 	CHATMANAGER("https://ci.rezxis.net/job/chatmanager/lastSuccessfulBuild/artifact/target/chatmanager-0.0.1-SNAPSHOT-jar-with-dependencies.jar"),
 	CORE("https://ci.rezxis.net/job/Core/lastSuccessfulBuild/artifact/target/Core-0.0.1-SNAPSHOT-jar-with-dependencies.jar"),
-	GAMEDEPLOYSPIGOT("https://ci.rezxis.net/job/GameDeploySpigot/lastSuccessfulBuild/artifact/target/gameDeploySpigot-0.0.1-SNAPSHOT-jar-with-dependencies.jar"),
 	MINEZSTATUS("https://ci.rezxis.net/job/MinezStatus/lastSuccessfulBuild/artifact/target/MinezStatus-0.0.1-SNAPSHOT.jar"),
 	PARTIES("https://ci.rezxis.net/job/Parties/lastSuccessfulBuild/artifact/target/parties-0.0.1-SNAPSHOT.jar"),
 	PREFERENCES("https://ci.rezxis.net/job/Preferences/lastSuccessfulBuild/artifact/target/Preferences-0.0.1-SNAPSHOT-jar-with-dependencies.jar"),
