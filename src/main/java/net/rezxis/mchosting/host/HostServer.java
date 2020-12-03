@@ -41,6 +41,7 @@ public class HostServer {
 		}
 		new Thread(new HealthCheckTask()).start();
 		client.connect();
+		client.startReconnectQueue();
 	}
 	
 	public static DockerClient connect() {
