@@ -218,7 +218,7 @@ public class ServerFileManager {
 					link.delete();
 				}
 				try {
-					FileUtils.forceDelete(new File("backups/"+server.getId()+".zip"));
+					FileUtils.forceDelete(new File("backups/"+obj.getId()+".zip"));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
