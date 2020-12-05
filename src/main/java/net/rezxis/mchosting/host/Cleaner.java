@@ -27,7 +27,7 @@ public class Cleaner {
 				delete.add(id);
 		}
 		for (Integer i : delete) {
-			System.out.println(i);
+			new File(i + ".zip").delete();
 		}
 	}
 }
