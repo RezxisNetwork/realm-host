@@ -1,7 +1,10 @@
 package net.rezxis.mchosting.host;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import org.apache.commons.io.FileUtils;
 
 import net.rezxis.mchosting.database.Database;
 import net.rezxis.mchosting.database.Tables;
@@ -27,7 +30,13 @@ public class Cleaner {
 				delete.add(id);
 		}
 		for (Integer i : delete) {
-			new File(i + ".zip").delete();
+			try {
+				FileUtils.forceDelete(new File(i + ".zip"));
+				System.out.println(new File(i + ".zip").getAbsolutePath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }
