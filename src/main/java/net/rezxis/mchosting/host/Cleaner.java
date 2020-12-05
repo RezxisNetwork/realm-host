@@ -32,7 +32,7 @@ public class Cleaner {
 		for (Integer i : delete) {
 			try {
 				FileUtils.forceDelete(new File(i + ".zip"));
-				System.out.println(new File(i + ".zip").getAbsolutePath());
+				System.out.println(new File("backups/" + i + ".zip").getAbsolutePath());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
