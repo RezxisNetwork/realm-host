@@ -16,7 +16,7 @@ public class Cleaner {
 		ArrayList<DBBackup> backups = Tables.getBTable().getAll();
 		ArrayList<Integer> delete = new ArrayList<>();
 		for (File file : files) {
-			int id = Integer.valueOf(file.getName());
+			int id = Integer.valueOf(file.getName().replace(".zip", ""));
 			boolean flag = true;
 			for (DBBackup backup : backups) {
 				if (backup.getId() == id) {
